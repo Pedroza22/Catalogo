@@ -14,44 +14,51 @@ function generateSlug(text: string): string {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('is_active', true)
-    .order('name')
+  try {
+    const supabase = await createClient()
+    
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name')
 
-  if (error) {
-    console.error('Error fetching categories:', error)
+    if (error) {
+      console.error('Error fetching categories:', error)
+      return []
+    }
+
+    return data || []
+  } catch {
     return []
   }
-
-  return data || []
 }
 
 export async function getProducts(categoryId?: string): Promise<Product[]> {
-  const supabase = await createClient()
-  
-  let query = supabase
-    .from('products')
-    .select('*, category:categories(*)')
-    .eq('is_active', true)
-    .gt('stock', 0)
-    .order('name')
+  try {
+    const supabase = await createClient()
+    
+    let query = supabase
+      .from('products')
+      .select('*, category:categories(*)')
+      .eq('is_active', true)
+      .gt('stock', 0)
+      .order('name')
 
-  if (categoryId) {
-    query = query.eq('category_id', categoryId)
-  }
+    if (categoryId) {
+      query = query.eq('category_id', categoryId)
+    }
 
-  const { data, error } = await query
+    const { data, error } = await query
 
-  if (error) {
-    console.error('Error fetching products:', error)
+    if (error) {
+      console.error('Error fetching products:', error)
+      return []
+    }
+
+    return data || []
+  } catch {
     return []
   }
-
-  return data || []
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
