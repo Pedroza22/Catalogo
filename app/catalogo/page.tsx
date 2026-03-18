@@ -31,18 +31,18 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
     <div className="min-h-screen flex flex-col">
       <Header user={user} />
       <main className="flex-1">
-        <section className="py-8 bg-muted/30 border-b">
-          <div className="container">
-            <h1 className="text-3xl font-bold text-foreground">Catálogo de Productos</h1>
-            <p className="text-muted-foreground mt-2">
+        <section className="py-6 sm:py-8 bg-muted/30 border-b">
+          <div className="container px-4 sm:px-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Catálogo de Productos</h1>
+            <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
               Encuentra todo lo que necesitas para tu negocio
             </p>
           </div>
         </section>
 
-        <section className="py-8">
-          <div className="container">
-            <div className="flex flex-col lg:flex-row gap-8">
+        <section className="py-4 sm:py-8">
+          <div className="container px-4 sm:px-6">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
               {/* Sidebar Filters */}
               <aside className="lg:w-64 shrink-0">
                 <CategoryFilter 

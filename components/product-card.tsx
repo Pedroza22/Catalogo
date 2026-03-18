@@ -43,20 +43,22 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         )}
       </div>
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         <p className="text-xs text-muted-foreground mb-1">{product.category?.name || 'Sin categoría'}</p>
-        <h3 className="font-semibold text-foreground line-clamp-2 min-h-[2.5rem]">{product.name}</h3>
-        <p className="text-lg font-bold text-primary mt-2">{formatPrice(product.price)}</p>
+        <h3 className="font-semibold text-foreground line-clamp-2 min-h-[2.5rem] text-sm sm:text-base">{product.name}</h3>
+        <p className="text-base sm:text-lg font-bold text-primary mt-2">{formatPrice(product.price)}</p>
         <p className="text-xs text-muted-foreground">{product.stock} disponibles</p>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-3 sm:p-4 pt-0">
         <Button 
           onClick={() => addItem(product)}
-          className="w-full"
+          className="w-full text-xs sm:text-sm"
+          size="sm"
           disabled={product.stock === 0}
         >
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Agregar al carrito
+          <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden xs:inline">Agregar al carrito</span>
+          <span className="xs:hidden">Agregar</span>
         </Button>
       </CardFooter>
     </Card>

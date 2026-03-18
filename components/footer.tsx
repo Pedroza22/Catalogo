@@ -4,23 +4,23 @@ import Link from 'next/link'
 export function Footer() {
   return (
     <footer className="border-t bg-secondary text-secondary-foreground">
-      <div className="container py-12">
-        <div className="grid gap-8 md:grid-cols-4">
-          <div className="space-y-4">
+      <div className="container py-8 sm:py-12 px-4 sm:px-6">
+        <div className="grid gap-8 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
+          <div className="space-y-4 col-span-2 sm:col-span-1">
             <div className="flex items-center gap-3">
               <Image
                 src="/images/logo.jpeg"
                 alt="AS DE NARIÑO"
-                width={48}
-                height={48}
-                className="rounded"
+                width={40}
+                height={40}
+                className="rounded w-10 h-10 sm:w-12 sm:h-12"
               />
               <div>
-                <p className="font-bold leading-none">AS DE NARIÑO</p>
+                <p className="font-bold leading-none text-sm sm:text-base">AS DE NARIÑO</p>
                 <p className="text-xs text-secondary-foreground/70">Comercializadora</p>
               </div>
             </div>
-            <p className="text-sm text-secondary-foreground/70">
+            <p className="text-xs sm:text-sm text-secondary-foreground/70">
               Tu aliado comercial en Nariño. Productos de calidad al mejor precio.
             </p>
           </div>

@@ -14,29 +14,29 @@ export function CategoryFilter({ categories, selectedCategory }: CategoryFilterP
   const searchParams = useSearchParams()
 
   return (
-    <div className="space-y-4">
-      <h3 className="font-semibold text-foreground">Categorías</h3>
-      <nav className="space-y-1">
+    <div className="space-y-3 lg:space-y-4">
+      <h3 className="font-semibold text-foreground text-sm lg:text-base">Categorías</h3>
+      <nav className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
         <Link
           href="/catalogo"
           className={cn(
-            "block px-3 py-2 rounded-md text-sm transition-colors",
+            "px-3 py-1.5 lg:py-2 rounded-full lg:rounded-md text-xs lg:text-sm transition-colors whitespace-nowrap",
             !selectedCategory
               ? "bg-primary text-primary-foreground font-medium"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground lg:bg-transparent"
           )}
         >
-          Todas las categorías
+          Todas
         </Link>
         {categories.map((category) => (
           <Link
             key={category.id}
             href={`/catalogo?categoria=${category.id}`}
             className={cn(
-              "block px-3 py-2 rounded-md text-sm transition-colors",
+              "px-3 py-1.5 lg:py-2 rounded-full lg:rounded-md text-xs lg:text-sm transition-colors whitespace-nowrap",
               selectedCategory === category.id
                 ? "bg-primary text-primary-foreground font-medium"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground lg:bg-transparent"
             )}
           >
             {category.name}

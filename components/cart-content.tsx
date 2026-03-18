@@ -85,16 +85,16 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
   }
 
   return (
-    <section className="py-8">
-      <div className="container">
-        <div className="grid gap-8 lg:grid-cols-3">
+    <section className="py-4 sm:py-8">
+      <div className="container px-4 sm:px-6">
+        <div className="grid gap-4 sm:gap-8 lg:grid-cols-3">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
             {items.map((item) => (
               <Card key={item.product.id}>
-                <CardContent className="p-4">
-                  <div className="flex gap-4">
-                    <div className="relative w-20 h-20 rounded-md overflow-hidden bg-muted shrink-0">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden bg-muted shrink-0">
                       {item.product.image_url ? (
                         <Image
                           src={item.product.image_url}
@@ -104,45 +104,45 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
-                          <Package className="h-8 w-8 text-muted-foreground/50" />
+                          <Package className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground/50" />
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-foreground truncate">{item.product.name}</h3>
-                      <p className="text-sm text-muted-foreground">{formatPrice(item.product.price)} c/u</p>
-                      <div className="flex items-center gap-2 mt-2">
+                      <h3 className="font-medium text-foreground text-sm sm:text-base line-clamp-1">{item.product.name}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{formatPrice(item.product.price)} c/u</p>
+                      <div className="flex items-center gap-1 sm:gap-2 mt-2">
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                         >
-                          <Minus className="h-4 w-4" />
+                          <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
-                        <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                        <span className="w-6 sm:w-8 text-center text-xs sm:text-sm font-medium">{item.quantity}</span>
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                           disabled={item.quantity >= item.product.stock}
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground">
+                    <div className="text-right flex flex-col items-end">
+                      <p className="font-semibold text-foreground text-sm sm:text-base">
                         {formatPrice(item.product.price * item.quantity)}
                       </p>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-destructive mt-2"
+                        className="h-7 w-7 sm:h-8 sm:w-8 text-destructive mt-1 sm:mt-2"
                         onClick={() => removeItem(item.product.id)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </div>
