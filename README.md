@@ -40,6 +40,8 @@ Para que la aplicación funcione correctamente, debes configurar las tablas y po
    - `002_fix_policies.sql`: Configura las políticas de seguridad (RLS).
    - `003_fix_profiles_rls.sql`: Ajustes específicos para la tabla de perfiles.
    - `004_fix_rls_recursion.sql`: Corrige posibles errores de recursión en políticas.
+   - `006_add_missing_columns.sql`: Agrega columnas de negocio necesarias (cost_price, sku, slug) si no existen.
+   - `005_insert_transformed_products.sql`: Inserta el catálogo de productos inicial (Desechables, Aseo, etc.).
 4. Ejecuta cada script (botón **Run**).
 
 ### 5. Scripts Útiles

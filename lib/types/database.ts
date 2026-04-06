@@ -26,9 +26,11 @@ export interface Product {
   id: string
   category_id: string | null
   name: string
+  slug: string
   description: string | null
   sku: string | null
   price: number
+  cost_price: number
   stock: number
   min_stock: number
   image_url: string | null
