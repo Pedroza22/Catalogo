@@ -27,8 +27,8 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
   }
 
   return (
-    <section className="py-10 sm:py-16 bg-muted/30">
-      <div className="container px-4 sm:px-6">
+    <section className="py-20 sm:py-28 bg-muted/20 border-y">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-6 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Categorías</h2>
           <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">Explora nuestras categorías de productos</p>

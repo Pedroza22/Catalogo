@@ -28,56 +28,68 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
     : products
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-muted/5">
       <Header user={user} />
       <main className="flex-1">
-        <section className="py-6 sm:py-8 bg-muted/30 border-b">
-          <div className="container px-4 sm:px-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Catálogo de Productos</h1>
-            <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
-              Encuentra todo lo que necesitas para tu negocio
+        <section className="py-12 bg-white border-b shadow-sm">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6">
+            <h1 className="text-4xl font-extrabold text-foreground tracking-tight">Catálogo de Productos</h1>
+            <p className="text-muted-foreground mt-2 text-lg">
+              Encuentra todo lo que necesitas para tu negocio al mejor precio
             </p>
           </div>
         </section>
 
-        <section className="py-4 sm:py-8">
-          <div className="container px-4 sm:px-6">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+        <section className="py-12">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col lg:flex-row gap-10">
               {/* Sidebar Filters */}
-              <aside className="lg:w-64 shrink-0">
-                <CategoryFilter 
-                  categories={categories} 
-                  selectedCategory={params.categoria}
-                />
+              <aside className="lg:w-72 shrink-0">
+                <div className="sticky top-24 space-y-8">
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-primary/5">
+                    <CategoryFilter 
+                      categories={categories} 
+                      selectedCategory={params.categoria}
+                    />
+                  </div>
+                  
+                  {/* Banner de ayuda opcional */}
+                  <div className="bg-primary/10 p-6 rounded-2xl border border-primary/20">
+                    <h4 className="font-bold text-primary mb-2">¿Necesitas ayuda?</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Si no encuentras lo que buscas, contáctanos y te ayudaremos con tu pedido.
+                    </p>
+                  </div>
+                </div>
               </aside>
 
               {/* Products Grid */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 {filteredProducts.length === 0 ? (
-                  <div className="text-center py-16 border-2 border-dashed rounded-xl">
-                    <Package className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="text-lg font-medium text-foreground mb-2">
-                      No hay productos disponibles
+                  <div className="text-center py-24 border-2 border-dashed rounded-3xl bg-muted/20">
+                    <Package className="h-20 w-20 mx-auto text-muted-foreground/20 mb-6" />
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
+                      No encontramos productos
                     </h3>
-                    <p className="text-muted-foreground max-w-md mx-auto">
+                    <p className="text-muted-foreground text-lg max-w-md mx-auto">
                       {params.categoria 
-                        ? 'No hay productos en esta categoría. Prueba seleccionando otra categoría.'
-                        : 'Pronto agregaremos productos a nuestro catálogo.'}
+                        ? 'Parece que no hay existencias en esta categoría actualmente.'
+                        : 'Estamos actualizando nuestro inventario. Vuelve pronto.'}
                     </p>
                   </div>
                 ) : (
-                  <>
-                    <div className="flex items-center justify-between mb-6">
-                      <p className="text-sm text-muted-foreground">
-                        {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+                  <div className="space-y-8">
+                    <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl shadow-sm border border-primary/5">
+                      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                        Mostrando <span className="text-primary">{filteredProducts.length}</span> productos
                       </p>
                     </div>
-                    <div className="grid gap-6 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                    <div className="grid gap-6 grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                       {filteredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                       ))}
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

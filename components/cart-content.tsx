@@ -85,151 +85,210 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
   }
 
   return (
-    <section className="py-4 sm:py-8">
-      <div className="container px-4 sm:px-6">
-        <div className="grid gap-4 sm:gap-8 lg:grid-cols-3">
-          {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
-            {items.map((item) => (
-              <Card key={item.product.id}>
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex gap-3 sm:gap-4">
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden bg-muted shrink-0">
-                      {item.product.image_url ? (
-                        <Image
-                          src={item.product.image_url}
-                          alt={item.product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center">
-                          <Package className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground/50" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-foreground text-sm sm:text-base line-clamp-1">{item.product.name}</h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{formatPrice(item.product.price)} c/u</p>
-                      <div className="flex items-center gap-1 sm:gap-2 mt-2">
+    <section className="py-8 sm:py-12 bg-muted/5">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid gap-8 lg:grid-cols-12 items-start">
+          {/* Cart Items (8 columns) */}
+          <div className="lg:col-span-8 space-y-4">
+            <div className="bg-white rounded-2xl shadow-sm border p-1">
+              {items.map((item, index) => (
+                <div 
+                  key={item.product.id}
+                  className={`p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center ${
+                    index !== items.length - 1 ? 'border-b' : ''
+                  }`}
+                >
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner">
+                    {item.product.image_url ? (
+                      <Image
+                        src={item.product.image_url}
+                        alt={item.product.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <Package className="h-10 w-10 text-muted-foreground/30" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <h3 className="font-bold text-lg text-foreground line-clamp-2 leading-tight">
+                      {item.product.name}
+                    </h3>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Precio unitario: <span className="text-foreground">{formatPrice(item.product.price)}</span>
+                    </p>
+                    
+                    <div className="flex items-center gap-3 mt-4">
+                      <div className="flex items-center border rounded-lg bg-muted/30 p-1">
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
-                          className="h-7 w-7 sm:h-8 sm:w-8"
+                          className="h-8 w-8 hover:bg-white hover:shadow-sm"
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                         >
-                          <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <Minus className="h-3.5 w-3.5" />
                         </Button>
-                        <span className="w-6 sm:w-8 text-center text-xs sm:text-sm font-medium">{item.quantity}</span>
+                        <span className="w-10 text-center font-bold text-sm">
+                          {item.quantity}
+                        </span>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
-                          className="h-7 w-7 sm:h-8 sm:w-8"
+                          className="h-8 w-8 hover:bg-white hover:shadow-sm"
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                           disabled={item.quantity >= item.product.stock}
                         >
-                          <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <Plus className="h-3.5 w-3.5" />
                         </Button>
                       </div>
-                    </div>
-                    <div className="text-right flex flex-col items-end">
-                      <p className="font-semibold text-foreground text-sm sm:text-base">
-                        {formatPrice(item.product.price * item.quantity)}
-                      </p>
+                      
                       <Button
                         variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 sm:h-8 sm:w-8 text-destructive mt-1 sm:mt-2"
+                        size="sm"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10 font-semibold text-xs gap-1.5"
                         onClick={() => removeItem(item.product.id)}
                       >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Eliminar
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                  <div className="text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-0">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Subtotal</p>
+                    <p className="text-xl font-black text-primary">
+                      {formatPrice(item.product.price * item.quantity)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Order Summary */}
-          <div>
-            <Card className="sticky top-20">
-              <CardHeader>
-                <CardTitle>Resumen del Pedido</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">{formatPrice(total)}</span>
+          {/* Order Summary (4 columns) */}
+          <div className="lg:col-span-4">
+            <Card className="sticky top-24 shadow-lg border-primary/5 overflow-hidden rounded-2xl">
+              <div className="bg-primary/5 px-6 py-4 border-b border-primary/10">
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5 text-primary" />
+                  Resumen de Compra
+                </CardTitle>
+              </div>
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-base">
+                    <span className="text-muted-foreground font-medium">Subtotal</span>
+                    <span className="font-bold text-foreground">{formatPrice(total)}</span>
+                  </div>
+                  <div className="flex justify-between text-base">
+                    <span className="text-muted-foreground font-medium">Envío Estimado</span>
+                    <span className="font-bold text-green-600">Gratis</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Envío</span>
-                  <span className="font-medium text-green-600">Gratis</span>
-                </div>
-                <div className="border-t pt-4">
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Total</span>
-                    <span className="font-bold text-lg text-primary">{formatPrice(total)}</span>
+
+                <div className="pt-4 border-t-2 border-dashed">
+                  <div className="flex justify-between items-end">
+                    <span className="font-bold text-lg">Total a Pagar</span>
+                    <span className="font-black text-2xl text-primary">{formatPrice(total)}</span>
                   </div>
                 </div>
 
                 {user && (
-                  <>
-                    <div className="border-t pt-4">
-                      <Label className="text-sm font-medium">Método de pago</Label>
+                  <div className="space-y-6 pt-2">
+                    <div className="space-y-3">
+                      <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                        Método de pago
+                      </Label>
                       <RadioGroup
                         value={paymentMethod}
                         onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}
-                        className="mt-2 space-y-2"
+                        className="grid gap-3"
                       >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="efectivo" id="efectivo" />
-                          <Label htmlFor="efectivo" className="flex items-center gap-2 cursor-pointer">
-                            <Banknote className="h-4 w-4" />
-                            Efectivo
+                        <div className="flex items-center">
+                          <RadioGroupItem value="efectivo" id="efectivo" className="peer sr-only" />
+                          <Label 
+                            htmlFor="efectivo" 
+                            className="flex flex-1 items-center gap-3 p-3 rounded-xl border-2 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:bg-muted/50 transition-all"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                              <Banknote className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-sm text-foreground">Efectivo</p>
+                              <p className="text-[10px] text-muted-foreground">Pago contra entrega</p>
+                            </div>
                           </Label>
                         </div>
                         {creditLimit > 0 && (
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="credito" id="credito" disabled={availableCredit <= 0} />
-                            <Label htmlFor="credito" className="flex items-center gap-2 cursor-pointer">
-                              <CreditCard className="h-4 w-4" />
-                              Crédito ({formatPrice(availableCredit)} disponible)
+                          <div className="flex items-center">
+                            <RadioGroupItem value="credito" id="credito" className="peer sr-only" disabled={availableCredit <= 0} />
+                            <Label 
+                              htmlFor="credito" 
+                              className={`flex flex-1 items-center gap-3 p-3 rounded-xl border-2 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:bg-muted/50 transition-all ${availableCredit <= 0 ? 'opacity-50 grayscale' : ''}`}
+                            >
+                              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-600 shrink-0">
+                                <CreditCard className="h-5 w-5" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-bold text-sm text-foreground">Crédito</p>
+                                <p className="text-[10px] text-green-600 font-bold uppercase tracking-tighter">
+                                  {formatPrice(availableCredit)} DISPONIBLE
+                                </p>
+                              </div>
                             </Label>
                           </div>
                         )}
                       </RadioGroup>
                     </div>
 
-                    <div>
-                      <Label htmlFor="notes" className="text-sm font-medium">Notas (opcional)</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="notes" className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                        Notas del Pedido
+                      </Label>
                       <Textarea
                         id="notes"
-                        placeholder="Instrucciones especiales para tu pedido..."
+                        placeholder="¿Alguna instrucción especial para la entrega?"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        className="mt-2"
-                        rows={3}
+                        className="min-h-[100px] rounded-xl border-2 focus-visible:ring-primary resize-none"
                       />
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {error && (
-                  <p className="text-sm text-destructive">{error}</p>
+                  <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <p className="text-sm text-destructive font-bold text-center">{error}</p>
+                  </div>
                 )}
               </CardContent>
-              <CardFooter>
+              <CardFooter className="p-6 bg-muted/30 border-t">
                 <Button 
-                  className="w-full" 
+                  className="w-full h-14 text-lg font-black shadow-lg shadow-primary/20 rounded-xl" 
                   size="lg"
                   onClick={handleCheckout}
                   disabled={loading}
                 >
-                  {loading ? 'Procesando...' : user ? 'Confirmar Pedido' : 'Iniciar Sesión para Comprar'}
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="h-4 w-4 border-2 border-white/30 border-t-white animate-spin rounded-full" />
+                      Procesando...
+                    </span>
+                  ) : user ? (
+                    'CONFIRMAR PEDIDO'
+                  ) : (
+                    'INICIAR SESIÓN PARA COMPRAR'
+                  )}
                 </Button>
               </CardFooter>
             </Card>
+            
+            <p className="text-center text-[10px] text-muted-foreground mt-4 font-medium px-4">
+              Al confirmar el pedido, aceptas nuestros términos de servicio y políticas de entrega.
+            </p>
           </div>
         </div>
       </div>

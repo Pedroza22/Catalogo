@@ -30,8 +30,8 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   }
 
   return (
-    <section className="py-10 sm:py-16">
-      <div className="container px-4 sm:px-6">
+    <section className="py-20 sm:py-28 bg-white">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-6 sm:mb-10">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Productos Destacados</h2>

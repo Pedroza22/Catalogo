@@ -20,8 +20,8 @@ export function Header({ user }: HeaderProps) {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/images/logo.jpeg"
