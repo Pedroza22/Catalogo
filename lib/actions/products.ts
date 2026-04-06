@@ -94,10 +94,43 @@ export async function getAllProducts(): Promise<Product[]> {
   return data || []
 }
 
+export async function uploadImage(file: File, path: string): Promise<string | null> {
+  const supabase = await createClient()
+  
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
+  const filePath = `${path}/${fileName}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('products')
+    .upload(filePath, file)
+
+  if (uploadError) {
+    console.error('Error uploading image:', uploadError)
+    return null
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('products')
+    .getPublicUrl(filePath)
+
+  return publicUrl
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient()
   
   const name = formData.get('name') as string
+  const imageFile = formData.get('image_file') as File
+  let imageUrl = formData.get('image_url') as string || null
+
+  if (imageFile && imageFile.size > 0) {
+    const uploadedUrl = await uploadImage(imageFile, 'images')
+    if (uploadedUrl) {
+      imageUrl = uploadedUrl
+    }
+  }
+
   const product = {
     name,
     slug: generateSlug(name),
@@ -107,7 +140,7 @@ export async function createProduct(formData: FormData) {
     stock: parseInt(formData.get('stock') as string),
     min_stock: parseInt(formData.get('min_stock') as string) || 5,
     category_id: formData.get('category_id') as string || null,
-    image_url: formData.get('image_url') as string || null,
+    image_url: imageUrl,
     is_active: true,
   }
 
@@ -124,6 +157,16 @@ export async function createProduct(formData: FormData) {
 export async function updateProduct(id: string, formData: FormData) {
   const supabase = await createClient()
   
+  const imageFile = formData.get('image_file') as File
+  let imageUrl = formData.get('image_url') as string || null
+
+  if (imageFile && imageFile.size > 0) {
+    const uploadedUrl = await uploadImage(imageFile, 'images')
+    if (uploadedUrl) {
+      imageUrl = uploadedUrl
+    }
+  }
+
   const product = {
     name: formData.get('name') as string,
     description: formData.get('description') as string,
@@ -132,7 +175,7 @@ export async function updateProduct(id: string, formData: FormData) {
     stock: parseInt(formData.get('stock') as string),
     min_stock: parseInt(formData.get('min_stock') as string) || 5,
     category_id: formData.get('category_id') as string || null,
-    image_url: formData.get('image_url') as string || null,
+    image_url: imageUrl,
     is_active: formData.get('is_active') === 'true',
   }
 
@@ -169,11 +212,21 @@ export async function createCategory(formData: FormData) {
   const supabase = await createClient()
   
   const name = formData.get('name') as string
+  const imageFile = formData.get('image_file') as File
+  let imageUrl = formData.get('image_url') as string || null
+
+  if (imageFile && imageFile.size > 0) {
+    const uploadedUrl = await uploadImage(imageFile, 'categories')
+    if (uploadedUrl) {
+      imageUrl = uploadedUrl
+    }
+  }
+
   const category = {
     name,
     slug: generateSlug(name),
     description: formData.get('description') as string || null,
-    image_url: formData.get('image_url') as string || null,
+    image_url: imageUrl,
     is_active: true,
   }
 
@@ -190,11 +243,21 @@ export async function createCategory(formData: FormData) {
 export async function updateCategory(id: string, formData: FormData) {
   const supabase = await createClient()
   
+  const imageFile = formData.get('image_file') as File
+  let imageUrl = formData.get('image_url') as string || null
+
+  if (imageFile && imageFile.size > 0) {
+    const uploadedUrl = await uploadImage(imageFile, 'categories')
+    if (uploadedUrl) {
+      imageUrl = uploadedUrl
+    }
+  }
+
   const category = {
     name: formData.get('name') as string,
     slug: generateSlug(formData.get('name') as string),
     description: formData.get('description') as string || null,
-    image_url: formData.get('image_url') as string || null,
+    image_url: imageUrl,
     is_active: formData.get('is_active') === 'true',
   }
 

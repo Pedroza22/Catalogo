@@ -163,9 +163,36 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="image_url">URL de Imagen</Label>
-              <Input id="image_url" name="image_url" type="url" defaultValue={product.image_url || ''} placeholder="https://..." />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="image_file">Subir Nueva Imagen</Label>
+                <Input 
+                  id="image_file" 
+                  name="image_file" 
+                  type="file" 
+                  accept="image/*" 
+                  className="cursor-pointer"
+                />
+                {product.image_url && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Imagen actual: <a href={product.image_url} target="_blank" rel="noopener noreferrer" className="underline">Ver actual</a>
+                  </p>
+                )}
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">o cambiar URL</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image_url">URL de Imagen</Label>
+                <Input id="image_url" name="image_url" type="url" defaultValue={product.image_url || ''} placeholder="https://..." />
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">

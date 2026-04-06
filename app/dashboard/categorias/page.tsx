@@ -129,9 +129,23 @@ export default function CategoriasPage() {
                   <Label htmlFor="description">Descripción</Label>
                   <Textarea id="description" name="description" placeholder="Descripción opcional" rows={3} />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">URL de Imagen</Label>
-                  <Input id="image_url" name="image_url" type="url" placeholder="https://..." />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="image_file">Subir Imagen</Label>
+                    <Input id="image_file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">o usar URL</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="image_url">URL de Imagen</Label>
+                    <Input id="image_url" name="image_url" type="url" placeholder="https://..." />
+                  </div>
                 </div>
                 {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
@@ -224,9 +238,9 @@ export default function CategoriasPage() {
                     <TableCell className="font-medium">{cat.name}</TableCell>
                     <TableCell className="text-muted-foreground line-clamp-1 max-w-[300px]">{cat.description || '-'}</TableCell>
                     <TableCell>
-                      <Badge variant={cat.is_active ? 'default' : 'secondary'}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cat.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {cat.is_active ? 'Activa' : 'Inactiva'}
-                      </Badge>
+                      </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(cat.created_at).toLocaleDateString('es-CO')}
