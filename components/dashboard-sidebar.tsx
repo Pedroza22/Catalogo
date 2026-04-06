@@ -31,15 +31,16 @@ const adminLinks = [
   { href: '/dashboard/productos', label: 'Productos', icon: Package },
   { href: '/dashboard/categorias', label: 'Categorías', icon: Tags },
   { href: '/dashboard/pedidos', label: 'Pedidos', icon: ShoppingCart },
-  { href: '/dashboard/clientes', label: 'Clientes', icon: Users },
-  { href: '/dashboard/inventario', label: 'Inventario', icon: Warehouse },
-  { href: '/dashboard/creditos', label: 'Créditos', icon: CreditCard },
+  { href: '/dashboard/clientes', label: 'Usuarios y Roles', icon: Users },
+  { href: '/dashboard/inventario', label: 'Movimientos Inventario', icon: Warehouse },
+  { href: '/dashboard/creditos', label: 'Créditos y Cartera', icon: CreditCard },
 ]
 
 const warehouseLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/pedidos', label: 'Pedidos', icon: ShoppingCart },
-  { href: '/dashboard/inventario', label: 'Inventario', icon: Warehouse },
+  { href: '/dashboard/pedidos', label: 'Gestión de Pedidos', icon: ShoppingCart },
+  { href: '/dashboard/productos', label: 'Control de Stock', icon: Package },
+  { href: '/dashboard/inventario', label: 'Movimientos de Bodega', icon: Warehouse },
 ]
 
 function SidebarContent({ profile, onLinkClick }: { profile: Profile; onLinkClick?: () => void }) {
