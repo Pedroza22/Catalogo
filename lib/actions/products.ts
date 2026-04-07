@@ -23,12 +23,18 @@ export async function getCategories(): Promise<Category[]> {
       .order('name')
 
     if (error) {
-      console.error('Error fetching categories:', error)
+      console.error('Error fetching categories detail:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
       return []
     }
 
     return data || []
-  } catch {
+  } catch (err) {
+    console.error('Unexpected error in getCategories:', err)
     return []
   }
 }
@@ -51,12 +57,18 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
     const { data, error } = await query
 
     if (error) {
-      console.error('Error fetching products:', error)
+      console.error('Error fetching products detail:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
       return []
     }
 
     return data || []
-  } catch {
+  } catch (err) {
+    console.error('Unexpected error in getProducts:', err)
     return []
   }
 }
