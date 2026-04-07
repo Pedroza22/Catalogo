@@ -11,8 +11,14 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // Usar NEXT_PUBLIC_SITE_URL si existe, si no, usar origin
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin
+      return NextResponse.redirect(`${siteUrl}${next}`)
     }
+    
+    console.error('Auth callback exchange error:', error)
+  } else {
+    console.warn('Auth callback: No code provided in URL')
   }
 
   return NextResponse.redirect(`${origin}/auth/error`)
