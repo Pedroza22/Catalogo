@@ -11,9 +11,20 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      // Usar NEXT_PUBLIC_SITE_URL si existe, si no, usar origin
+      // Obtener el perfil del usuario para saber su rol
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .single()
+
+      let redirectPath = '/dashboard' // Por defecto para admin y bodeguero
+      
+      if (profile?.role === 'cliente') {
+        redirectPath = '/' // Redirigir clientes al catálogo principal
+      }
+
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin
-      return NextResponse.redirect(`${siteUrl}${next}`)
+      return NextResponse.redirect(`${siteUrl}${redirectPath}`)
     }
     
     console.error('Auth callback exchange error:', error)

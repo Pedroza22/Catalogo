@@ -15,6 +15,16 @@ export async function signIn(formData: FormData) {
     return { error: error.message }
   }
 
+  // Obtener rol para redirigir
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .single()
+
+  if (profile?.role === 'cliente') {
+    redirect('/')
+  }
+
   redirect('/dashboard')
 }
 
