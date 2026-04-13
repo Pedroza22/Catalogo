@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { Checkbox } from '@/components/ui/checkbox'
 import { getProductById, updateProduct, deleteProduct, getAllCategories } from '@/lib/actions/products'
 import { ArrowLeft, Loader2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -20,6 +21,7 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
   const { id } = use(params)
   const [product, setProduct] = useState<Product | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -40,6 +42,7 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
 
       setProduct(prod)
       setCategories(cats)
+      setSelectedCategories(prod.categories?.map(c => c.id) || [])
       setLoading(false)
     }
 
@@ -52,6 +55,12 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
     setError(null)
 
     const formData = new FormData(e.currentTarget)
+    
+    // Añadir categorías seleccionadas
+    selectedCategories.forEach(catId => {
+      formData.append('category_ids', catId)
+    })
+
     const result = await updateProduct(id, formData)
 
     if (result.error) {
@@ -134,18 +143,34 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
               <Textarea id="description" name="description" defaultValue={product.description || ''} rows={3} />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category_id">Categoría</Label>
-              <Select name="category_id" defaultValue={product.category_id || undefined}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona una categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="space-y-3">
+              <Label>Categorías *</Label>
+              <div className="grid grid-cols-2 gap-4 border rounded-md p-4 bg-muted/20">
+                {categories.map((cat) => (
+                  <div key={cat.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`cat-${cat.id}`} 
+                      checked={selectedCategories.includes(cat.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedCategories(prev => [...prev, cat.id])
+                        } else {
+                          setSelectedCategories(prev => prev.filter(id => id !== cat.id))
+                        }
+                      }}
+                    />
+                    <label 
+                      htmlFor={`cat-${cat.id}`}
+                      className="text-sm font-medium leading-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {cat.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {selectedCategories.length === 0 && (
+                <p className="text-xs text-destructive">Debes seleccionar al menos una categoría</p>
+              )}
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">

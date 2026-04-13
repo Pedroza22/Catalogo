@@ -38,6 +38,7 @@ export interface Product {
   created_at: string
   updated_at: string
   category?: Category
+  categories?: Category[]
 }
 
 export type OrderStatus = 'pendiente' | 'preparando' | 'despachado' | 'entregado' | 'cancelado'

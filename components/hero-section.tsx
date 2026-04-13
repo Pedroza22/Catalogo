@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Truck, CreditCard, Shield } from 'lucide-react'
+import { ArrowRight, Truck, Shield } from 'lucide-react'
 
 export function HeroSection() {
   return (
@@ -46,7 +46,7 @@ export function HeroSection() {
         </div>
 
         {/* Features */}
-        <div className="mt-10 sm:mt-16 grid gap-3 sm:gap-6 grid-cols-1 sm:grid-cols-3">
+        <div className="mt-10 sm:mt-16 grid gap-3 sm:gap-6 grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto">
           <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl bg-secondary-foreground/5">
             <div className="p-2 sm:p-3 rounded-lg bg-primary/10">
               <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -54,15 +54,6 @@ export function HeroSection() {
             <div>
               <h3 className="font-semibold text-secondary-foreground text-sm sm:text-base">Entrega Rápida</h3>
               <p className="text-xs sm:text-sm text-secondary-foreground/70">Recibe tus pedidos en tiempo récord</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl bg-secondary-foreground/5">
-            <div className="p-2 sm:p-3 rounded-lg bg-primary/10">
-              <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-foreground text-sm sm:text-base">Crédito Disponible</h3>
-              <p className="text-xs sm:text-sm text-secondary-foreground/70">Opciones de pago flexibles para tu negocio</p>
             </div>
           </div>
           <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 rounded-xl bg-secondary-foreground/5">

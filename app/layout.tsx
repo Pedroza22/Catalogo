@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/lib/hooks/use-cart'
+import { CookieBanner } from '@/components/cookie-banner'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <CartProvider>
           {children}
+          <CookieBanner />
         </CartProvider>
         <Analytics />
       </body>

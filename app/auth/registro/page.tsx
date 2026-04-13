@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import { createClient } from '@/lib/supabase/client'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
@@ -21,6 +22,7 @@ export default function RegistroPage() {
     fullName: '',
     phone: '',
     address: '',
+    acceptTerms: false,
   })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -40,6 +42,11 @@ export default function RegistroPage() {
 
     if (formData.password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres')
+      return
+    }
+
+    if (!formData.acceptTerms) {
+      setError('Debes aceptar el tratamiento de datos personales para registrarte')
       return
     }
 
@@ -198,6 +205,24 @@ export default function RegistroPage() {
                   required
                   className="h-11"
                 />
+              </div>
+            </div>
+            <div className="flex items-start space-x-2 pt-2">
+              <Checkbox 
+                id="acceptTerms" 
+                checked={formData.acceptTerms}
+                onCheckedChange={(checked) => 
+                  setFormData(prev => ({ ...prev, acceptTerms: checked === true }))
+                }
+                className="mt-1"
+              />
+              <div className="grid gap-1.5 leading-none">
+                <Label
+                  htmlFor="acceptTerms"
+                  className="text-sm font-medium leading-relaxed cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Acepto el <Link href="/politicas" className="text-primary hover:underline underline-offset-4">tratamiento de mis datos personales</Link> conforme a la Ley 1581 de 2012.
+                </Label>
               </div>
             </div>
             {error && (

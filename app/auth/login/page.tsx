@@ -141,6 +141,11 @@ export default function LoginPage() {
                 'Iniciar Sesión'
               )}
             </Button>
+            <div className="text-center">
+              <Link href="/politicas" className="text-xs text-muted-foreground hover:text-primary transition-colors underline-offset-4 hover:underline">
+                Tratamiento de Datos Personales
+              </Link>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 pb-8">
             <div className="text-center text-sm text-muted-foreground">

@@ -64,6 +64,11 @@ export function Footer() {
                   Mi Perfil
                 </Link>
               </li>
+              <li>
+                <Link href="/politicas" className="text-secondary-foreground/70 hover:text-secondary-foreground transition-colors">
+                  Privacidad y Cookies
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -72,7 +77,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-secondary-foreground/70">
               <li>Nariño, Colombia</li>
               <li>contacto@asdenarino.com</li>
-              <li>+57 300 000 0000</li>
+              <li>+57 320 526 7974</li>
             </ul>
           </div>
         </div>

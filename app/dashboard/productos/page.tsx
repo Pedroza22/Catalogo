@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { getAllProducts, getAllCategories } from '@/lib/actions/products'
-import { Plus, Package, Pencil } from 'lucide-react'
+import { Plus, Package } from 'lucide-react'
+import { ProductActions } from '@/components/product-actions'
 
 export default async function ProductosPage() {
   const [products, categories] = await Promise.all([
@@ -71,7 +72,19 @@ export default async function ProductosPage() {
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell className="text-muted-foreground">{product.sku}</TableCell>
-                    <TableCell>{product.category?.name || '-'}</TableCell>
+                    <TableCell>
+                      {product.categories && product.categories.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {product.categories.map((cat) => (
+                            <Badge key={cat.id} variant="outline" className="text-[10px] px-1.5 py-0">
+                              {cat.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        '-'
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">{formatPrice(product.price)}</TableCell>
                     <TableCell className="text-right">
                       <span className={product.stock <= product.min_stock ? 'text-yellow-600 font-medium' : ''}>
@@ -84,11 +97,7 @@ export default async function ProductosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/dashboard/productos/${product.id}`}>
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                      <ProductActions productId={product.id} productName={product.name} />
                     </TableCell>
                   </TableRow>
                 ))}

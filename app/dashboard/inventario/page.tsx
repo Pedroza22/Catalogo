@@ -15,6 +15,7 @@ import { getAllProducts } from '@/lib/actions/products'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, Warehouse, Loader2, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react'
 import type { Product, MovementType } from '@/lib/types/database'
+import { cn } from '@/lib/utils'
 
 export default function InventarioPage() {
   const router = useRouter()
@@ -27,6 +28,7 @@ export default function InventarioPage() {
   const [quantity, setQuantity] = useState('')
   const [reason, setReason] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [filterType, setFilterType] = useState<'all' | 'low' | 'out'>('all')
 
   useEffect(() => {
     getAllProducts().then((prods) => {
@@ -34,6 +36,16 @@ export default function InventarioPage() {
       setLoading(false)
     })
   }, [])
+
+  const filteredInventory = products.filter(p => {
+    if (!p.is_active) return false
+    if (filterType === 'low') return p.stock > 0 && p.stock <= p.min_stock
+    if (filterType === 'out') return p.stock <= 0
+    return true
+  })
+
+  const lowStockCount = products.filter(p => p.is_active && p.stock > 0 && p.stock <= p.min_stock).length
+  const outOfStockCount = products.filter(p => p.is_active && p.stock <= 0).length
 
   const handleMovement = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -224,21 +236,57 @@ export default function InventarioPage() {
         </Dialog>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className={cn("cursor-pointer transition-colors", filterType === 'all' && "border-primary bg-primary/5")} onClick={() => setFilterType('all')}>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium">Todos los Productos</CardTitle>
+            <div className="text-2xl font-bold">{products.filter(p => p.is_active).length}</div>
+          </CardHeader>
+        </Card>
+        <Card className={`cursor-pointer transition-colors ${filterType === 'low' ? 'border-yellow-500 bg-yellow-50' : ''}`} onClick={() => setFilterType('low')}>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium text-yellow-600">Bajo Stock</CardTitle>
+            <div className="text-2xl font-bold text-yellow-600">{lowStockCount}</div>
+          </CardHeader>
+        </Card>
+        <Card className={cn("cursor-pointer transition-colors", filterType === 'out' && "border-destructive bg-destructive/5")} onClick={() => setFilterType('out')}>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm font-medium text-destructive">Sin Stock</CardTitle>
+            <div className="text-2xl font-bold text-destructive">{outOfStockCount}</div>
+          </CardHeader>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>Estado del Inventario</CardTitle>
-          <CardDescription>Stock actual de todos los productos</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Estado del Inventario</CardTitle>
+              <CardDescription>
+                {filterType === 'all' && "Mostrando todos los productos activos"}
+                {filterType === 'low' && "Mostrando productos con bajo stock (≤ stock mínimo)"}
+                {filterType === 'out' && "Mostrando productos agotados"}
+              </CardDescription>
+            </div>
+            {filterType !== 'all' && (
+              <Button variant="ghost" size="sm" onClick={() => setFilterType('all')}>
+                Ver todos
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="text-center py-12">
               <Loader2 className="h-8 w-8 mx-auto animate-spin text-muted-foreground" />
             </div>
-          ) : products.length === 0 ? (
+          ) : filteredInventory.length === 0 ? (
             <div className="text-center py-12">
               <Warehouse className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No hay productos</h3>
-              <p className="text-muted-foreground">Agrega productos primero para gestionar inventario</p>
+              <h3 className="text-lg font-medium mb-2">No se encontraron productos</h3>
+              <p className="text-muted-foreground">
+                {filterType === 'all' ? 'Agrega productos primero para gestionar inventario' : 'No hay productos que coincidan con este filtro'}
+              </p>
             </div>
           ) : (
             <Table>
@@ -252,7 +300,7 @@ export default function InventarioPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.filter(p => p.is_active).map((product) => {
+                {filteredInventory.map((product) => {
                   const status = getStockStatus(product)
                   return (
                     <TableRow key={product.id}>

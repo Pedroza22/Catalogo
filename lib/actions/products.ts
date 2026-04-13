@@ -45,13 +45,26 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
     
     let query = supabase
       .from('products')
-      .select('*, category:categories(*)')
+      .select('*, product_categories(categories(*))')
       .eq('is_active', true)
-      .gt('stock', 0)
+      .gt('stock', 0) // Ocultar productos sin stock en el catálogo público
       .order('name')
 
     if (categoryId) {
-      query = query.eq('category_id', categoryId)
+      // Filtrar por categoría en la tabla intermedia
+      const { data: productIds, error: filterError } = await supabase
+        .from('product_categories')
+        .select('product_id')
+        .eq('category_id', categoryId)
+      
+      if (filterError) {
+        console.error('Error filtering by category:', filterError)
+        return []
+      }
+
+      if (productIds) {
+        query = query.in('id', productIds.map(p => p.product_id))
+      }
     }
 
     const { data, error } = await query
@@ -59,14 +72,20 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
     if (error) {
       console.error('Error fetching products detail:', {
         message: error.message,
-        code: error.code,
         details: error.details,
-        hint: error.hint
+        hint: error.hint,
+        code: error.code
       })
       return []
     }
 
-    return data || []
+    // Transformar la respuesta para que sea compatible con la interfaz Product
+    const transformedProducts = (data || []).map((p: any) => ({
+      ...p,
+      categories: p.product_categories?.map((pc: any) => pc.categories).filter(Boolean) || []
+    }))
+
+    return transformedProducts
   } catch (err) {
     console.error('Unexpected error in getProducts:', err)
     return []
@@ -78,16 +97,24 @@ export async function getProductById(id: string): Promise<Product | null> {
   
   const { data, error } = await supabase
     .from('products')
-    .select('*, category:categories(*)')
+    .select('*, product_categories(categories(*))')
     .eq('id', id)
     .single()
 
   if (error) {
-    console.error('Error fetching product:', error)
+    console.error('Error fetching product:', {
+      message: error.message,
+      details: error.details,
+      code: error.code
+    })
     return null
   }
 
-  return data
+  // Transformar para incluir la lista plana de categorías
+  return {
+    ...data,
+    categories: data.product_categories?.map((pc: any) => pc.categories).filter(Boolean) || []
+  }
 }
 
 export async function getAllProducts(): Promise<Product[]> {
@@ -95,15 +122,22 @@ export async function getAllProducts(): Promise<Product[]> {
   
   const { data, error } = await supabase
     .from('products')
-    .select('*, category:categories(*)')
+    .select('*, product_categories(categories(*))')
     .order('name')
 
   if (error) {
-    console.error('Error fetching all products:', error)
+    console.error('Error fetching all products:', {
+      message: error.message,
+      details: error.details,
+      code: error.code
+    })
     return []
   }
 
-  return data || []
+  return (data || []).map((p: any) => ({
+    ...p,
+    categories: p.product_categories?.map((pc: any) => pc.categories).filter(Boolean) || []
+  }))
 }
 
 export async function uploadImage(file: File, path: string): Promise<string | null> {
@@ -151,15 +185,28 @@ export async function createProduct(formData: FormData) {
     price: parseFloat(formData.get('price') as string),
     stock: parseInt(formData.get('stock') as string),
     min_stock: parseInt(formData.get('min_stock') as string) || 5,
-    category_id: formData.get('category_id') as string || null,
     image_url: imageUrl,
     is_active: true,
   }
 
-  const { error } = await supabase.from('products').insert(product)
+  const { data: newProduct, error } = await supabase
+    .from('products')
+    .insert(product)
+    .select('id')
+    .single()
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Manejar múltiples categorías
+  const categoryIds = formData.getAll('category_ids') as string[]
+  if (categoryIds.length > 0) {
+    const productCategories = categoryIds.map(catId => ({
+      product_id: newProduct.id,
+      category_id: catId
+    }))
+    await supabase.from('product_categories').insert(productCategories)
   }
 
   revalidateTag('products', 'max')
@@ -186,7 +233,6 @@ export async function updateProduct(id: string, formData: FormData) {
     price: parseFloat(formData.get('price') as string),
     stock: parseInt(formData.get('stock') as string),
     min_stock: parseInt(formData.get('min_stock') as string) || 5,
-    category_id: formData.get('category_id') as string || null,
     image_url: imageUrl,
     is_active: formData.get('is_active') === 'true',
   }
@@ -198,6 +244,28 @@ export async function updateProduct(id: string, formData: FormData) {
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Actualizar categorías (borrar y volver a insertar)
+  const categoryIds = formData.getAll('category_ids') as string[]
+  
+  // Siempre intentamos limpiar las categorías actuales
+  const { error: deleteError } = await supabase.from('product_categories').delete().eq('product_id', id)
+  
+  if (deleteError) {
+    console.error('Error deleting old categories:', deleteError)
+  }
+
+  // Si hay nuevas categorías, las insertamos
+  if (categoryIds.length > 0) {
+    const productCategories = categoryIds.map(catId => ({
+      product_id: id,
+      category_id: catId
+    }))
+    const { error: insertError } = await supabase.from('product_categories').insert(productCategories)
+    if (insertError) {
+      console.error('Error inserting new categories:', insertError)
+    }
   }
 
   revalidateTag('products', 'max')

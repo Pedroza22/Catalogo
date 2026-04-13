@@ -44,7 +44,11 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
       <CardContent className="p-3 sm:p-4">
-        <p className="text-xs text-muted-foreground mb-1">{product.category?.name || 'Sin categoría'}</p>
+        <p className="text-xs text-muted-foreground mb-1">
+          {product.categories && product.categories.length > 0 
+            ? product.categories.map(c => c.name).join(', ') 
+            : product.category?.name || 'Sin categoría'}
+        </p>
         <h3 className="font-semibold text-foreground line-clamp-2 min-h-[2.5rem] text-sm sm:text-base">{product.name}</h3>
         <p className="text-base sm:text-lg font-bold text-primary mt-2">{formatPrice(product.price)}</p>
         <p className="text-xs text-muted-foreground">{product.stock} disponibles</p>
