@@ -4,14 +4,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { getAllProducts, getAllCategories } from '@/lib/actions/products'
-import { Plus, Package } from 'lucide-react'
+import { Plus, Package, Search } from 'lucide-react'
 import { ProductActions } from '@/components/product-actions'
+import { ProductSearch } from '@/components/product-search'
 
-export default async function ProductosPage() {
+interface ProductosPageProps {
+  searchParams: Promise<{ buscar?: string }>
+}
+
+export default async function ProductosPage({ searchParams }: ProductosPageProps) {
+  const params = await searchParams
   const [products, categories] = await Promise.all([
     getAllProducts(),
     getAllCategories()
   ])
+
+  const filteredProducts = params.buscar
+    ? products.filter(p => 
+        p.name.toLowerCase().includes(params.buscar!.toLowerCase()) ||
+        p.sku?.toLowerCase().includes(params.buscar!.toLowerCase()) ||
+        p.categories?.some(c => c.name.toLowerCase().includes(params.buscar!.toLowerCase()))
+      )
+    : products
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -37,22 +51,40 @@ export default async function ProductosPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Lista de Productos</CardTitle>
-          <CardDescription>{products.length} productos en total</CardDescription>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <CardTitle>Lista de Productos</CardTitle>
+            <CardDescription>
+              {params.buscar 
+                ? `Mostrando ${filteredProducts.length} de ${products.length} productos`
+                : `${products.length} productos en total`}
+            </CardDescription>
+          </div>
+          <ProductSearch 
+            placeholder="Buscar por nombre, SKU o categoría..." 
+            className="w-full sm:w-72" 
+          />
         </CardHeader>
         <CardContent>
-          {products.length === 0 ? (
+          {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
-              <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No hay productos</h3>
-              <p className="text-muted-foreground mb-4">Comienza agregando tu primer producto</p>
-              <Link href="/dashboard/productos/nuevo">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Crear Producto
-                </Button>
-              </Link>
+              <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+              <h3 className="text-lg font-medium mb-2">
+                {params.buscar ? 'No se encontraron resultados' : 'No hay productos'}
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                {params.buscar 
+                  ? 'Intenta con otro término de búsqueda'
+                  : 'Comienza agregando tu primer producto'}
+              </p>
+              {!params.buscar && (
+                <Link href="/dashboard/productos/nuevo">
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Crear Producto
+                  </Button>
+                </Link>
+              )}
             </div>
           ) : (
             <Table>
@@ -68,7 +100,7 @@ export default async function ProductosPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell className="text-muted-foreground">{product.sku}</TableCell>

@@ -141,18 +141,22 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function uploadImage(file: File, path: string): Promise<string | null> {
+  console.log(`[uploadImage] Iniciando subida de archivo: ${file.name}, tamaño: ${file.size} bytes, tipo: ${file.type}`);
   const supabase = await createClient()
   
   const fileExt = file.name.split('.').pop()
   const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
   const filePath = `${path}/${fileName}`
 
+  console.log(`[uploadImage] Ruta de destino en storage: ${filePath}`);
+
+  // El nombre del bucket es "products" (inglés)
   const { error: uploadError } = await supabase.storage
     .from('products')
     .upload(filePath, file)
 
   if (uploadError) {
-    console.error('Error uploading image:', uploadError)
+    console.error('[uploadImage] Error al subir imagen a Supabase Storage (bucket: products):', uploadError)
     return null
   }
 
@@ -160,6 +164,7 @@ export async function uploadImage(file: File, path: string): Promise<string | nu
     .from('products')
     .getPublicUrl(filePath)
 
+  console.log(`[uploadImage] Subida exitosa al bucket "productos". URL pública: ${publicUrl}`);
   return publicUrl
 }
 
@@ -214,16 +219,34 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
+  console.log(`[updateProduct] Iniciando actualización para ID: ${id}`);
   const supabase = await createClient()
   
   const imageFile = formData.get('image_file') as File
-  let imageUrl = formData.get('image_url') as string || null
+  console.log(`[updateProduct] Archivo recibido: ${imageFile?.name || 'Ninguno'}, tamaño: ${imageFile?.size || 0} bytes`);
 
+  // Obtenemos la URL actual de la base de datos antes de actualizar
+  const { data: currentProduct } = await supabase
+    .from('products')
+    .select('image_url')
+    .eq('id', id)
+    .single()
+
+  let imageUrl = currentProduct?.image_url || null
+  console.log(`[updateProduct] URL de imagen actual en DB: ${imageUrl}`);
+
+  // Si se subió un nuevo archivo, lo procesamos
   if (imageFile && imageFile.size > 0) {
+    console.log('[updateProduct] Se detectó un nuevo archivo. Procediendo a subir...');
     const uploadedUrl = await uploadImage(imageFile, 'images')
     if (uploadedUrl) {
       imageUrl = uploadedUrl
+      console.log(`[updateProduct] Nueva URL obtenida tras subida: ${imageUrl}`);
+    } else {
+      console.error('[updateProduct] No se pudo obtener la URL tras la subida');
     }
+  } else {
+    console.log('[updateProduct] No se subió un archivo nuevo. Manteniendo imagen actual.');
   }
 
   const product = {
@@ -237,14 +260,19 @@ export async function updateProduct(id: string, formData: FormData) {
     is_active: formData.get('is_active') === 'true',
   }
 
+  console.log('[updateProduct] Datos finales a actualizar en DB:', { ...product, image_url: imageUrl });
+
   const { error } = await supabase
     .from('products')
     .update(product)
     .eq('id', id)
 
   if (error) {
+    console.error('[updateProduct] Error al actualizar producto en base de datos:', error);
     return { error: error.message }
   }
+
+  console.log('[updateProduct] Actualización exitosa en la tabla products');
 
   // Actualizar categorías (borrar y volver a insertar)
   const categoryIds = formData.getAll('category_ids') as string[]
@@ -324,7 +352,14 @@ export async function updateCategory(id: string, formData: FormData) {
   const supabase = await createClient()
   
   const imageFile = formData.get('image_file') as File
-  let imageUrl = formData.get('image_url') as string || null
+  // Obtener la URL actual de la categoría
+  const { data: currentCategory } = await supabase
+    .from('categories')
+    .select('image_url')
+    .eq('id', id)
+    .single()
+
+  let imageUrl = currentCategory?.image_url || null
 
   if (imageFile && imageFile.size > 0) {
     const uploadedUrl = await uploadImage(imageFile, 'categories')

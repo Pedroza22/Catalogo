@@ -130,9 +130,9 @@ export default function NuevoProductoPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 pt-2">
               <div className="space-y-2">
-                <Label htmlFor="image_file">Subir Imagen desde el Dispositivo</Label>
+                <Label htmlFor="image_file">Imagen del Producto</Label>
                 <Input 
                   id="image_file" 
                   name="image_file" 
@@ -140,20 +140,9 @@ export default function NuevoProductoPage() {
                   accept="image/*" 
                   className="cursor-pointer"
                 />
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">o usar URL</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="image_url">URL de Imagen</Label>
-                <Input id="image_url" name="image_url" type="url" placeholder="https://..." />
+                <p className="text-xs text-muted-foreground">
+                  Sube una imagen desde tu dispositivo para el catálogo.
+                </p>
               </div>
             </div>
 

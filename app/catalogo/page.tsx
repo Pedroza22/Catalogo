@@ -4,7 +4,8 @@ import { ProductCard } from '@/components/product-card'
 import { getProfile } from '@/lib/actions/auth'
 import { getProducts, getCategories } from '@/lib/actions/products'
 import { CategoryFilter } from '@/components/category-filter'
-import { Package, Search } from 'lucide-react'
+import { ProductSearch } from '@/components/product-search'
+import { Package } from 'lucide-react'
 
 interface CatalogoPageProps {
   searchParams: Promise<{ categoria?: string; buscar?: string }>
@@ -65,6 +66,18 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
 
               {/* Products Grid */}
               <div className="flex-1 min-w-0">
+                <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+                  <ProductSearch 
+                    placeholder="¿Qué estás buscando hoy?" 
+                    className="w-full md:max-w-md"
+                  />
+                  <div className="hidden md:block">
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                      <span className="text-primary">{filteredProducts.length}</span> productos encontrados
+                    </p>
+                  </div>
+                </div>
+
                 {filteredProducts.length === 0 ? (
                   <div className="text-center py-24 border-2 border-dashed rounded-3xl bg-muted/20">
                     <Package className="h-20 w-20 mx-auto text-muted-foreground/20 mb-6" />
@@ -72,18 +85,15 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
                       No encontramos productos
                     </h3>
                     <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                      {params.categoria 
-                        ? 'Parece que no hay existencias en esta categoría actualmente.'
-                        : 'Estamos actualizando nuestro inventario. Vuelve pronto.'}
+                      {params.buscar 
+                        ? `No hay resultados para "${params.buscar}". Intenta con otro término.`
+                        : params.categoria 
+                          ? 'Parece que no hay existencias en esta categoría actualmente.'
+                          : 'Estamos actualizando nuestro inventario. Vuelve pronto.'}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-8">
-                    <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl shadow-sm border border-primary/5">
-                      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-                        Mostrando <span className="text-primary">{filteredProducts.length}</span> productos
-                      </p>
-                    </div>
                     <div className="grid gap-6 grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                       {filteredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />

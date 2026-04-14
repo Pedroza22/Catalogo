@@ -188,9 +188,9 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 pt-2">
               <div className="space-y-2">
-                <Label htmlFor="image_file">Subir Nueva Imagen</Label>
+                <Label htmlFor="image_file">Imagen del Producto</Label>
                 <Input 
                   id="image_file" 
                   name="image_file" 
@@ -198,25 +198,18 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
                   accept="image/*" 
                   className="cursor-pointer"
                 />
-                {product.image_url && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Imagen actual: <a href={product.image_url} target="_blank" rel="noopener noreferrer" className="underline">Ver actual</a>
+                {product.image_url ? (
+                  <div className="flex items-center gap-2 mt-2">
+                    <img src={product.image_url} alt="Vista previa" className="h-10 w-10 object-cover rounded border" />
+                    <p className="text-xs text-muted-foreground">
+                      Imagen actual configurada. Sube una nueva para reemplazarla.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Sube una imagen desde tu dispositivo para el catálogo.
                   </p>
                 )}
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">o cambiar URL</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="image_url">URL de Imagen</Label>
-                <Input id="image_url" name="image_url" type="url" defaultValue={product.image_url || ''} placeholder="https://..." />
               </div>
             </div>
 
