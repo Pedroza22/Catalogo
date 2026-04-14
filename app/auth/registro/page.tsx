@@ -207,23 +207,21 @@ export default function RegistroPage() {
                 />
               </div>
             </div>
-            <div className="flex items-start space-x-2 pt-2">
+            <div className="flex flex-row items-start space-x-3 pt-2">
               <Checkbox 
                 id="acceptTerms" 
                 checked={formData.acceptTerms}
                 onCheckedChange={(checked) => 
                   setFormData(prev => ({ ...prev, acceptTerms: checked === true }))
                 }
-                className="mt-1"
+                className="mt-0.5 shrink-0"
               />
-              <div className="grid gap-1.5 leading-none">
-                <Label
-                  htmlFor="acceptTerms"
-                  className="text-sm font-medium leading-relaxed cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Acepto el <Link href="/politicas" className="text-primary hover:underline underline-offset-4">tratamiento de mis datos personales</Link> conforme a la Ley 1581 de 2012.
-                </Label>
-              </div>
+              <label
+                htmlFor="acceptTerms"
+                className="text-sm font-normal leading-tight cursor-pointer text-muted-foreground block"
+              >
+                Acepto el <Link href="/politicas" className="text-primary hover:underline font-medium">tratamiento de mis datos personales</Link> conforme a la Ley 1581 de 2012.
+              </label>
             </div>
             {error && (
               <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm p-3 rounded-md text-center animate-in fade-in zoom-in duration-200">
