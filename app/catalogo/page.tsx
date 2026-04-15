@@ -96,7 +96,7 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
                   <div className="space-y-8">
                     <div className="grid gap-6 grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                       {filteredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} userRole={user?.role} />
                       ))}
                     </div>
                   </div>

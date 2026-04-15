@@ -21,7 +21,7 @@ export default async function HomePage() {
       <main className="flex-1">
         <HeroSection />
         <CategoriesSection categories={categories} />
-        <FeaturedProducts products={products.slice(0, 8)} />
+        <FeaturedProducts products={products.slice(0, 8)} userRole={user?.role} />
       </main>
       <Footer />
     </div>

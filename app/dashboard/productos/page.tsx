@@ -7,9 +7,10 @@ import { getAllProducts, getAllCategories } from '@/lib/actions/products'
 import { Plus, Package, Search } from 'lucide-react'
 import { ProductActions } from '@/components/product-actions'
 import { ProductSearch } from '@/components/product-search'
+import { CategorySelectFilter } from '@/components/category-select-filter'
 
 interface ProductosPageProps {
-  searchParams: Promise<{ buscar?: string }>
+  searchParams: Promise<{ buscar?: string; categoria?: string }>
 }
 
 export default async function ProductosPage({ searchParams }: ProductosPageProps) {
@@ -19,13 +20,19 @@ export default async function ProductosPage({ searchParams }: ProductosPageProps
     getAllCategories()
   ])
 
-  const filteredProducts = params.buscar
-    ? products.filter(p => 
-        p.name.toLowerCase().includes(params.buscar!.toLowerCase()) ||
-        p.sku?.toLowerCase().includes(params.buscar!.toLowerCase()) ||
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = params.buscar
+      ? p.name.toLowerCase().includes(params.buscar.toLowerCase()) ||
+        p.sku?.toLowerCase().includes(params.buscar.toLowerCase()) ||
         p.categories?.some(c => c.name.toLowerCase().includes(params.buscar!.toLowerCase()))
-      )
-    : products
+      : true;
+
+    const matchesCategory = params.categoria
+      ? p.categories?.some(c => c.id === params.categoria)
+      : true;
+
+    return matchesSearch && matchesCategory;
+  })
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -51,33 +58,39 @@ export default async function ProductosPage({ searchParams }: ProductosPageProps
       </div>
 
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div>
             <CardTitle>Lista de Productos</CardTitle>
             <CardDescription>
-              {params.buscar 
+              {(params.buscar || params.categoria) 
                 ? `Mostrando ${filteredProducts.length} de ${products.length} productos`
                 : `${products.length} productos en total`}
             </CardDescription>
           </div>
-          <ProductSearch 
-            placeholder="Buscar por nombre, SKU o categoría..." 
-            className="w-full sm:w-72" 
-          />
+          <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+            <CategorySelectFilter 
+              categories={categories} 
+              className="w-full sm:w-[200px]" 
+            />
+            <ProductSearch 
+              placeholder="Buscar por nombre, SKU o categoría..." 
+              className="w-full sm:w-[300px]" 
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
               <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-medium mb-2">
-                {params.buscar ? 'No se encontraron resultados' : 'No hay productos'}
+                {(params.buscar || params.categoria) ? 'No se encontraron resultados' : 'No hay productos'}
               </h3>
               <p className="text-muted-foreground mb-4">
-                {params.buscar 
-                  ? 'Intenta con otro término de búsqueda'
+                {(params.buscar || params.categoria) 
+                  ? 'Intenta con otro término de búsqueda o cambia la categoría'
                   : 'Comienza agregando tu primer producto'}
               </p>
-              {!params.buscar && (
+              {!(params.buscar || params.categoria) && (
                 <Link href="/dashboard/productos/nuevo">
                   <Button>
                     <Plus className="mr-2 h-4 w-4" />

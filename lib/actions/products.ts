@@ -47,7 +47,6 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
       .from('products')
       .select('*, product_categories(categories(*))')
       .eq('is_active', true)
-      .gt('stock', 0) // Ocultar productos sin stock en el catálogo público
       .order('name')
 
     if (categoryId) {
@@ -150,10 +149,15 @@ export async function uploadImage(file: File, path: string): Promise<string | nu
 
   console.log(`[uploadImage] Ruta de destino en storage: ${filePath}`);
 
+  const buffer = await file.arrayBuffer()
+
   // El nombre del bucket es "products" (inglés)
   const { error: uploadError } = await supabase.storage
     .from('products')
-    .upload(filePath, file)
+    .upload(filePath, buffer, {
+      contentType: file.type,
+      upsert: true
+    })
 
   if (uploadError) {
     console.error('[uploadImage] Error al subir imagen a Supabase Storage (bucket: products):', uploadError)

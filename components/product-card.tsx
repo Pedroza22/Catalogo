@@ -9,9 +9,10 @@ import type { Product } from '@/lib/types/database'
 
 interface ProductCardProps {
   product: Product
+  userRole?: string
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, userRole }: ProductCardProps) {
   const { addItem } = useCart()
 
   const formatPrice = (price: number) => {
@@ -37,7 +38,9 @@ export function ProductCard({ product }: ProductCardProps) {
             <Package className="h-16 w-16 text-muted-foreground/50" />
           </div>
         )}
-        {product.stock <= product.min_stock && product.stock > 0 && (
+        
+        {/* Solo mostrar etiqueta de "Pocas unidades" a administradores o bodegueros */}
+        {(userRole === 'admin' || userRole === 'bodeguero') && product.stock <= product.min_stock && product.stock > 0 && (
           <span className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
             Pocas unidades
           </span>
@@ -51,7 +54,11 @@ export function ProductCard({ product }: ProductCardProps) {
         </p>
         <h3 className="font-semibold text-foreground line-clamp-2 min-h-[2.5rem] text-sm sm:text-base">{product.name}</h3>
         <p className="text-base sm:text-lg font-bold text-primary mt-2">{formatPrice(product.price)}</p>
-        <p className="text-xs text-muted-foreground">{product.stock} disponibles</p>
+        
+        {/* Solo mostrar stock a administradores o bodegueros */}
+        {(userRole === 'admin' || userRole === 'bodeguero') && (
+          <p className="text-xs text-muted-foreground mt-1">{product.stock} disponibles</p>
+        )}
       </CardContent>
       <CardFooter className="p-3 sm:p-4 pt-0">
         <Button 
@@ -61,8 +68,8 @@ export function ProductCard({ product }: ProductCardProps) {
           disabled={product.stock === 0}
         >
           <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">Agregar al carrito</span>
-          <span className="xs:hidden">Agregar</span>
+          <span className="hidden xs:inline">{product.stock === 0 ? 'Agotado' : 'Agregar al carrito'}</span>
+          <span className="xs:hidden">{product.stock === 0 ? 'Agotado' : 'Agregar'}</span>
         </Button>
       </CardFooter>
     </Card>

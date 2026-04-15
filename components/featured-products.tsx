@@ -6,9 +6,10 @@ import type { Product } from '@/lib/types/database'
 
 interface FeaturedProductsProps {
   products: Product[]
+  userRole?: string
 }
 
-export function FeaturedProducts({ products }: FeaturedProductsProps) {
+export function FeaturedProducts({ products, userRole }: FeaturedProductsProps) {
   if (products.length === 0) {
     return (
       <section className="py-10 sm:py-16">
@@ -46,7 +47,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
         </div>
         <div className="grid gap-3 sm:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} userRole={userRole} />
           ))}
         </div>
         <div className="mt-6 sm:mt-8 text-center md:hidden">
