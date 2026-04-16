@@ -118,7 +118,7 @@ export default function NuevoProductoPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="price">Precio *</Label>
-                <Input id="price" name="price" type="number" min="0" step="100" required placeholder="0" />
+                <Input id="price" name="price" type="number" min="0" step="10" required placeholder="0" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Stock Inicial *</Label>

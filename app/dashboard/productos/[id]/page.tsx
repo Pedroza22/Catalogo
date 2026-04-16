@@ -176,7 +176,7 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="price">Precio *</Label>
-                <Input id="price" name="price" type="number" min="0" step="100" defaultValue={product.price} required />
+                <Input id="price" name="price" type="number" min="0" step="10" defaultValue={product.price} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Stock *</Label>
