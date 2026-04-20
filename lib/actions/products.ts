@@ -320,6 +320,50 @@ export async function deleteProduct(id: string) {
   return { success: true }
 }
 
+export async function hardDeleteProduct(id: string) {
+  const supabase = await createClient()
+  
+  // Delete related categories first
+  const { error: catError } = await supabase
+    .from('product_categories')
+    .delete()
+    .eq('product_id', id)
+    
+  if (catError) {
+    console.error('Error deleting product categories:', catError)
+    return { error: catError.message }
+  }
+  
+  const { error } = await supabase
+    .from('products')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error hard deleting product:', error)
+    return { error: error.message }
+  }
+
+  revalidateTag('products', 'max')
+  return { success: true }
+}
+
+export async function toggleProductStatus(id: string, isActive: boolean) {
+  const supabase = await createClient()
+  
+  const { error } = await supabase
+    .from('products')
+    .update({ is_active: isActive })
+    .eq('id', id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidateTag('products', 'max')
+  return { success: true }
+}
+
 export async function createCategory(formData: FormData) {
   const supabase = await createClient()
   

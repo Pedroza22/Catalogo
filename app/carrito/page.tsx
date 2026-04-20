@@ -12,7 +12,7 @@ export default async function CarritoPage() {
       <Header user={user} />
       <main className="flex-1">
         <section className="py-8 bg-muted/30 border-b">
-          <div className="container">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6">
             <h1 className="text-3xl font-bold text-foreground">Carrito de Compras</h1>
             <p className="text-muted-foreground mt-2">
               Revisa y confirma tu pedido

@@ -1,9 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { ShoppingCart, Package } from 'lucide-react'
+import { ShoppingCart, Package, Plus, Minus } from 'lucide-react'
 import { useCart } from '@/lib/hooks/use-cart'
 import type { Product } from '@/lib/types/database'
 
@@ -13,7 +14,10 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, userRole }: ProductCardProps) {
-  const { addItem } = useCart()
+  const { items, addItem, updateQuantity } = useCart()
+  
+  const cartItem = items.find(item => item.product.id === product.id)
+  const quantityInCart = cartItem?.quantity || 0
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -61,16 +65,39 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
         )}
       </CardContent>
       <CardFooter className="p-3 sm:p-4 pt-0">
-        <Button 
-          onClick={() => addItem(product)}
-          className="w-full text-xs sm:text-sm"
-          size="sm"
-          disabled={product.stock === 0}
-        >
-          <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">{product.stock === 0 ? 'Agotado' : 'Agregar al carrito'}</span>
-          <span className="xs:hidden">{product.stock === 0 ? 'Agotado' : 'Agregar'}</span>
-        </Button>
+        {quantityInCart > 0 ? (
+          <div className="flex items-center w-full justify-between border rounded-lg bg-muted/30 p-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-white hover:shadow-sm"
+              onClick={() => updateQuantity(product.id, quantityInCart - 1)}
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </Button>
+            <span className="w-10 text-center font-bold text-sm">
+              {quantityInCart}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-white hover:shadow-sm"
+              onClick={() => updateQuantity(product.id, quantityInCart + 1)}
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ) : (
+          <Button 
+            onClick={() => addItem(product)}
+            className="w-full text-xs sm:text-sm"
+            size="sm"
+          >
+            <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Agregar al carrito</span>
+            <span className="xs:hidden">Agregar</span>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )

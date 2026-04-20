@@ -142,7 +142,7 @@ export default async function ProductosPage({ searchParams }: ProductosPageProps
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <ProductActions productId={product.id} productName={product.name} />
+                      <ProductActions productId={product.id} productName={product.name} isActive={product.is_active} />
                     </TableCell>
                   </TableRow>
                 ))}

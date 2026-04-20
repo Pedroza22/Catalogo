@@ -139,7 +139,6 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                           size="icon"
                           className="h-8 w-8 hover:bg-white hover:shadow-sm"
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          disabled={item.quantity >= item.product.stock}
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </Button>
