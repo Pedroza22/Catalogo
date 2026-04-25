@@ -100,54 +100,67 @@ export default async function ProductosPage({ searchParams }: ProductosPageProps
               )}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Producto</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Categoría</TableHead>
-                  <TableHead className="text-right">Precio</TableHead>
-                  <TableHead className="text-right">Stock</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{product.sku}</TableCell>
-                    <TableCell>
-                      {product.categories && product.categories.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {product.categories.map((cat) => (
-                            <Badge key={cat.id} variant="outline" className="text-[10px] px-1.5 py-0">
-                              {cat.name}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        '-'
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">{formatPrice(product.price)}</TableCell>
-                    <TableCell className="text-right">
-                      <span className={product.stock <= product.min_stock ? 'text-yellow-600 font-medium' : ''}>
-                        {product.stock}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={product.is_active ? 'default' : 'secondary'}>
-                        {product.is_active ? 'Activo' : 'Inactivo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <ProductActions productId={product.id} productName={product.name} isActive={product.is_active} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle sm:px-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-b-2">
+                      <TableHead className="w-[35%] min-w-[200px] py-4">Producto</TableHead>
+                      <TableHead className="w-[15%] min-w-[100px] py-4">SKU</TableHead>
+                      <TableHead className="w-[20%] min-w-[150px] py-4">Categoría</TableHead>
+                      <TableHead className="text-right py-4 min-w-[100px]">Precio</TableHead>
+                      <TableHead className="text-right py-4 min-w-[80px]">Stock</TableHead>
+                      <TableHead className="py-4 min-w-[100px]">Estado</TableHead>
+                      <TableHead className="text-right py-4 pr-6 min-w-[150px]">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredProducts.map((product) => (
+                      <TableRow key={product.id} className="hover:bg-muted/30 transition-colors">
+                        <TableCell className="font-semibold py-4">
+                          <div className="flex flex-col">
+                            <span className="line-clamp-2">{product.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground py-4">{product.sku}</TableCell>
+                        <TableCell className="py-4">
+                          {product.categories && product.categories.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {product.categories.map((cat) => (
+                                <Badge key={cat.id} variant="outline" className="text-[10px] px-1.5 py-0 bg-background/50 whitespace-nowrap">
+                                  {cat.name}
+                                </Badge>
+                              ))}
+                            </div>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right py-4 font-medium">{formatPrice(product.price)}</TableCell>
+                        <TableCell className="text-right py-4">
+                          <span className={product.stock <= product.min_stock ? 'text-yellow-600 font-bold' : 'font-medium'}>
+                            {product.stock}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <Badge variant={product.is_active ? 'default' : 'secondary'} className="font-semibold whitespace-nowrap">
+                            {product.is_active ? 'Activo' : 'Inactivo'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right py-4 pr-4">
+                          <ProductActions 
+                            productId={product.id} 
+                            productName={product.name} 
+                            isActive={product.is_active} 
+                            imageUrl={product.image_url}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>

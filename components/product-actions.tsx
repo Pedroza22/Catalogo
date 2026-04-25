@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Trash2, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Pencil, Trash2, Loader2, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +16,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { hardDeleteProduct, toggleProductStatus } from '@/lib/actions/products'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -23,12 +32,14 @@ interface ProductActionsProps {
   productId: string
   productName: string
   isActive: boolean
+  imageUrl?: string | null
 }
 
-export function ProductActions({ productId, productName, isActive }: ProductActionsProps) {
+export function ProductActions({ productId, productName, isActive, imageUrl }: ProductActionsProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isToggling, setIsToggling] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const router = useRouter()
 
   const handleToggleStatus = async () => {
@@ -71,13 +82,67 @@ export function ProductActions({ productId, productName, isActive }: ProductActi
   }
 
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="flex items-center justify-end gap-1 sm:gap-2">
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            title="Ver imagen del producto"
+            className="h-8 w-8 sm:h-9 sm:w-9"
+          >
+            <ImageIcon className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[350px] p-4">
+          <DialogHeader>
+            <DialogTitle className="truncate pr-6 text-base">{productName}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-2">
+            <div className="relative aspect-square w-full max-w-[200px] overflow-hidden rounded-lg border bg-muted shadow-inner">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={productName}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-muted-foreground italic text-xs p-4 text-center">
+                  Sin imagen disponible
+                </div>
+              )}
+            </div>
+            {!imageUrl && (
+              <p className="mt-3 text-[11px] text-muted-foreground text-center leading-tight">
+                Este producto no tiene una imagen asignada.
+              </p>
+            )}
+          </div>
+          <DialogFooter className="flex flex-row gap-2 mt-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsPreviewOpen(false)}
+              className="flex-1 h-8 text-xs"
+            >
+              Cerrar
+            </Button>
+            <Link href={`/dashboard/productos/${productId}`} className="flex-1">
+              <Button className="w-full h-8 text-xs px-2">
+                {imageUrl ? 'Cambiar' : 'Agregar'}
+              </Button>
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Button 
         variant="ghost" 
         size="icon" 
         title={isActive ? "Desactivar producto" : "Activar producto"}
         onClick={handleToggleStatus}
         disabled={isToggling}
+        className="h-8 w-8 sm:h-9 sm:w-9"
       >
         {isToggling ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -89,14 +154,24 @@ export function ProductActions({ productId, productName, isActive }: ProductActi
       </Button>
 
       <Link href={`/dashboard/productos/${productId}`}>
-        <Button variant="ghost" size="icon" title="Editar producto">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          title="Editar producto"
+          className="h-8 w-8 sm:h-9 sm:w-9"
+        >
           <Pencil className="h-4 w-4" />
         </Button>
       </Link>
 
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" title="Eliminar producto definitivamente">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 sm:h-9 sm:w-9 text-destructive hover:text-destructive hover:bg-destructive/10" 
+            title="Eliminar producto definitivamente"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </AlertDialogTrigger>

@@ -186,15 +186,20 @@ export async function createProduct(formData: FormData) {
     }
   }
 
+  const price = parseFloat(formData.get('price') as string)
+  const stock = parseInt(formData.get('stock') as string)
+  const min_stock = parseInt(formData.get('min_stock') as string)
+
   const product = {
     name,
     slug: generateSlug(name),
     description: formData.get('description') as string,
     sku: formData.get('sku') as string,
-    price: parseFloat(formData.get('price') as string),
-    stock: parseInt(formData.get('stock') as string),
-    min_stock: parseInt(formData.get('min_stock') as string) || 5,
+    price: isNaN(price) ? 0 : price,
+    stock: isNaN(stock) ? 0 : stock,
+    min_stock: isNaN(min_stock) ? 5 : min_stock,
     image_url: imageUrl,
+    colors: formData.get('colors') ? (formData.get('colors') as string).split(',').filter(Boolean) : [],
     is_active: true,
   }
 
@@ -218,7 +223,7 @@ export async function createProduct(formData: FormData) {
     await supabase.from('product_categories').insert(productCategories)
   }
 
-  revalidateTag('products', 'max')
+  revalidateTag('products')
   return { success: true }
 }
 
@@ -253,14 +258,19 @@ export async function updateProduct(id: string, formData: FormData) {
     console.log('[updateProduct] No se subió un archivo nuevo. Manteniendo imagen actual.');
   }
 
+  const price = parseFloat(formData.get('price') as string)
+  const stock = parseInt(formData.get('stock') as string)
+  const min_stock = parseInt(formData.get('min_stock') as string)
+
   const product = {
     name: formData.get('name') as string,
     description: formData.get('description') as string,
     sku: formData.get('sku') as string,
-    price: parseFloat(formData.get('price') as string),
-    stock: parseInt(formData.get('stock') as string),
-    min_stock: parseInt(formData.get('min_stock') as string) || 5,
+    price: isNaN(price) ? 0 : price,
+    stock: isNaN(stock) ? 0 : stock,
+    min_stock: isNaN(min_stock) ? 5 : min_stock,
     image_url: imageUrl,
+    colors: formData.get('colors') ? (formData.get('colors') as string).split(',').filter(Boolean) : [],
     is_active: formData.get('is_active') === 'true',
   }
 
@@ -300,7 +310,7 @@ export async function updateProduct(id: string, formData: FormData) {
     }
   }
 
-  revalidateTag('products', 'max')
+  revalidateTag('products')
   return { success: true }
 }
 
@@ -316,7 +326,7 @@ export async function deleteProduct(id: string) {
     return { error: error.message }
   }
 
-  revalidateTag('products', 'max')
+  revalidateTag('products')
   return { success: true }
 }
 
@@ -344,7 +354,7 @@ export async function hardDeleteProduct(id: string) {
     return { error: error.message }
   }
 
-  revalidateTag('products', 'max')
+  revalidateTag('products')
   return { success: true }
 }
 
@@ -360,7 +370,7 @@ export async function toggleProductStatus(id: string, isActive: boolean) {
     return { error: error.message }
   }
 
-  revalidateTag('products', 'max')
+  revalidateTag('products')
   return { success: true }
 }
 
@@ -392,7 +402,7 @@ export async function createCategory(formData: FormData) {
     return { error: error.message }
   }
 
-  revalidateTag('categories', 'max')
+  revalidateTag('categories')
   return { success: true }
 }
 
@@ -433,7 +443,7 @@ export async function updateCategory(id: string, formData: FormData) {
     return { error: error.message }
   }
 
-  revalidateTag('categories', 'max')
+  revalidateTag('categories')
   return { success: true }
 }
 
@@ -449,7 +459,7 @@ export async function deleteCategory(id: string) {
     return { error: error.message }
   }
 
-  revalidateTag('categories', 'max')
+  revalidateTag('categories')
   return { success: true }
 }
 

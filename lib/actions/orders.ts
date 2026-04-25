@@ -43,6 +43,7 @@ export async function createOrder(
     quantity: item.quantity,
     unit_price: item.product.price,
     subtotal: item.product.price * item.quantity,
+    selected_color: item.selected_color,
   }))
 
   const { error: itemsError } = await supabase

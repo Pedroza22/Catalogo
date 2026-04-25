@@ -19,6 +19,7 @@ export interface Category {
   description: string | null
   image_url: string | null
   is_active: boolean
+  colors: string[]
   created_at: string
 }
 
@@ -65,6 +66,7 @@ export interface OrderItem {
   quantity: number
   unit_price: number
   subtotal: number
+  selected_color: string | null
   product?: Product
 }
 
@@ -98,4 +100,5 @@ export interface CreditMovement {
 export interface CartItem {
   product: Product
   quantity: number
+  selected_color?: string | null
 }

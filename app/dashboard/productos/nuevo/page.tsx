@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { createProduct, getAllCategories } from '@/lib/actions/products'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, X, Plus } from 'lucide-react'
 import type { Category } from '@/lib/types/database'
 
 export default function NuevoProductoPage() {
@@ -20,10 +20,23 @@ export default function NuevoProductoPage() {
   const [error, setError] = useState<string | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [colors, setColors] = useState<string[]>([])
+  const [newColor, setNewColor] = useState('')
 
   useEffect(() => {
     getAllCategories().then(setCategories)
   }, [])
+
+  const addColor = () => {
+    if (newColor && !colors.includes(newColor)) {
+      setColors([...colors, newColor])
+      setNewColor('')
+    }
+  }
+
+  const removeColor = (color: string) => {
+    setColors(colors.filter(c => c !== color))
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -36,6 +49,9 @@ export default function NuevoProductoPage() {
     selectedCategories.forEach(catId => {
       formData.append('category_ids', catId)
     })
+
+    // Añadir colores
+    formData.append('colors', colors.join(','))
 
     const result = await createProduct(formData)
 
@@ -113,6 +129,38 @@ export default function NuevoProductoPage() {
               {selectedCategories.length === 0 && (
                 <p className="text-xs text-muted-foreground">Selecciona al menos una categoría</p>
               )}
+            </div>
+
+            <div className="space-y-3">
+              <Label>Colores Disponibles</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {colors.map((color) => (
+                  <div key={color} className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                    {color}
+                    <button type="button" onClick={() => removeColor(color)} className="hover:text-primary/70">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input 
+                  value={newColor} 
+                  onChange={(e) => setNewColor(e.target.value)} 
+                  placeholder="Ej: Rojo, Verde, Azul..." 
+                  className="max-w-[200px]"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addColor()
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" size="icon" onClick={addColor}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Agrega los colores disponibles para este producto.</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">

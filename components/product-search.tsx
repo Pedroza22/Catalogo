@@ -24,7 +24,7 @@ export function ProductSearch({
   
   const initialValue = searchParams.get(paramName) || ''
   const [value, setValue] = useState(initialValue)
-  const debouncedValue = useDebounce(value, 400)
+  const debouncedValue = useDebounce(value, 1000)
 
   useEffect(() => {
     // Solo actualizar si el valor debounced es diferente al parámetro actual
