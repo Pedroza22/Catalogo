@@ -94,45 +94,51 @@ export function ProductActions({ productId, productName, isActive, imageUrl }: P
             <ImageIcon className="h-4 w-4 text-muted-foreground" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[350px] p-4">
-          <DialogHeader>
-            <DialogTitle className="truncate pr-6 text-base">{productName}</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center justify-center py-2">
-            <div className="relative aspect-square w-full max-w-[200px] overflow-hidden rounded-lg border bg-muted shadow-inner">
+        <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="bg-primary px-4 py-3 pr-10">
+            <DialogTitle className="text-white text-sm font-bold truncate uppercase tracking-wide">
+              {productName}
+            </DialogTitle>
+          </div>
+          
+          <div className="p-6 bg-white flex flex-col items-center">
+            <div className="relative aspect-square w-full max-w-[240px] overflow-hidden rounded-xl border-2 border-muted bg-muted/30 shadow-sm group">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={productName}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-muted-foreground italic text-xs p-4 text-center">
+                <div className="flex h-full w-full flex-col items-center justify-center text-muted-foreground/60 italic text-xs p-6 text-center gap-2">
+                  <ImageIcon className="h-10 w-10 opacity-20" />
                   Sin imagen disponible
                 </div>
               )}
             </div>
+            
             {!imageUrl && (
-              <p className="mt-3 text-[11px] text-muted-foreground text-center leading-tight">
-                Este producto no tiene una imagen asignada.
+              <p className="mt-4 text-[11px] text-muted-foreground font-medium bg-muted/50 px-3 py-1.5 rounded-full">
+                Este producto no tiene una imagen asignada
               </p>
             )}
-          </div>
-          <DialogFooter className="flex flex-row gap-2 mt-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsPreviewOpen(false)}
-              className="flex-1 h-8 text-xs"
-            >
-              Cerrar
-            </Button>
-            <Link href={`/dashboard/productos/${productId}`} className="flex-1">
-              <Button className="w-full h-8 text-xs px-2">
-                {imageUrl ? 'Cambiar' : 'Agregar'}
+
+            <div className="flex w-full gap-3 mt-8">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsPreviewOpen(false)}
+                className="flex-1 h-10 text-xs font-bold uppercase tracking-wider border-2 hover:bg-muted"
+              >
+                Cerrar
               </Button>
-            </Link>
-          </DialogFooter>
+              <Link href={`/dashboard/productos/${productId}`} className="flex-1">
+                <Button className="w-full h-10 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all">
+                  {imageUrl ? 'Cambiar Foto' : 'Subir Foto'}
+                </Button>
+              </Link>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

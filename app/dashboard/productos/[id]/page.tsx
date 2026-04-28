@@ -225,15 +225,15 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="price">Precio *</Label>
-                <Input id="price" name="price" type="number" min="0" step="10" defaultValue={product.price} required />
+                <Input id="price" name="price" type="number" min="0" step="any" defaultValue={product.price} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Stock *</Label>
-                <Input id="stock" name="stock" type="number" min="0" defaultValue={product.stock} required />
+                <Input id="stock" name="stock" type="number" min="0" step="any" defaultValue={product.stock} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="min_stock">Stock Mínimo</Label>
-                <Input id="min_stock" name="min_stock" type="number" min="0" defaultValue={product.min_stock} />
+                <Input id="min_stock" name="min_stock" type="number" min="0" step="any" defaultValue={product.min_stock} />
               </div>
             </div>
 

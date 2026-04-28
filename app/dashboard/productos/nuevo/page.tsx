@@ -166,15 +166,15 @@ export default function NuevoProductoPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="price">Precio *</Label>
-                <Input id="price" name="price" type="number" min="0" step="10" required placeholder="0" />
+                <Input id="price" name="price" type="number" min="0" step="any" required placeholder="0" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Stock Inicial *</Label>
-                <Input id="stock" name="stock" type="number" min="0" required placeholder="0" />
+                <Input id="stock" name="stock" type="number" min="0" step="any" required placeholder="0" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="min_stock">Stock Mínimo</Label>
-                <Input id="min_stock" name="min_stock" type="number" min="0" defaultValue="5" />
+                <Input id="min_stock" name="min_stock" type="number" min="0" step="any" defaultValue="5" />
               </div>
             </div>
 
