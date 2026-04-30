@@ -46,7 +46,7 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
             <div className="flex flex-col lg:flex-row gap-10">
               {/* Sidebar Filters */}
               <aside className="lg:w-72 shrink-0">
-                <div className="sticky top-24 space-y-8">
+                <div className="lg:sticky lg:top-24 space-y-8 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-2 custom-scrollbar">
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-primary/5">
                     <CategoryFilter 
                       categories={categories} 

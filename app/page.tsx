@@ -1,6 +1,7 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { HeroSection } from '@/components/hero-section'
+import { PromoCarousel } from '@/components/promo-carousel'
 import { FeaturedProducts } from '@/components/featured-products'
 import { CategoriesSection } from '@/components/categories-section'
 import { getProfile } from '@/lib/actions/auth'
@@ -20,6 +21,7 @@ export default async function HomePage() {
       <Header user={user} />
       <main className="flex-1">
         <HeroSection />
+        <PromoCarousel />
         <CategoriesSection categories={categories} />
         <FeaturedProducts products={products.slice(0, 8)} userRole={user?.role} />
       </main>
