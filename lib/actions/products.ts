@@ -200,6 +200,7 @@ export async function createProduct(formData: FormData) {
     min_stock: isNaN(min_stock) ? 5 : min_stock,
     image_url: imageUrl,
     colors: formData.get('colors') ? (formData.get('colors') as string).split(',').filter(Boolean) : [],
+    sizes: formData.get('sizes') ? (formData.get('sizes') as string).split(',').filter(Boolean) : [],
     is_active: true,
   }
 
@@ -271,6 +272,7 @@ export async function updateProduct(id: string, formData: FormData) {
     min_stock: isNaN(min_stock) ? 5 : min_stock,
     image_url: imageUrl,
     colors: formData.get('colors') ? (formData.get('colors') as string).split(',').filter(Boolean) : [],
+    sizes: formData.get('sizes') ? (formData.get('sizes') as string).split(',').filter(Boolean) : [],
     is_active: formData.get('is_active') === 'true',
   }
 

@@ -26,11 +26,15 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
   const [selectedColor, setSelectedColor] = useState<string | null>(
     product.colors && product.colors.length > 0 ? product.colors[0] : null
   )
+  const [selectedSize, setSelectedSize] = useState<string | null>(
+    product.sizes && product.sizes.length > 0 ? product.sizes[0] : null
+  )
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   
   const cartItem = items.find(item => 
     item.product.id === product.id && 
-    item.selected_color === selectedColor
+    item.selected_color === selectedColor &&
+    item.selected_size === selectedSize
   )
   const quantityInCart = cartItem?.quantity || 0
 
@@ -132,6 +136,29 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
           </div>
         )}
 
+        {/* Selector de Tallas */}
+        {product.sizes && product.sizes.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Talla: <span className="text-foreground">{selectedSize}</span></p>
+            <div className="flex flex-wrap gap-2">
+              {product.sizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={cn(
+                    "flex min-w-[32px] h-8 items-center justify-center rounded-md border text-xs font-bold transition-all hover:bg-muted",
+                    selectedSize === size 
+                      ? "bg-primary text-white border-primary shadow-sm" 
+                      : "bg-white text-muted-foreground border-input"
+                  )}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Solo mostrar stock a administradores o bodegueros */}
         {(userRole === 'admin' || userRole === 'bodeguero') && (
           <p className="text-xs text-muted-foreground mt-auto pt-2">{product.stock} disponibles</p>
@@ -144,7 +171,7 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 hover:bg-white hover:shadow-sm"
-              onClick={() => updateQuantity(product.id, quantityInCart - 1, selectedColor)}
+              onClick={() => updateQuantity(product.id, quantityInCart - 1, selectedColor, selectedSize)}
             >
               <Minus className="h-3.5 w-3.5" />
             </Button>
@@ -155,14 +182,14 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 hover:bg-white hover:shadow-sm"
-              onClick={() => updateQuantity(product.id, quantityInCart + 1, selectedColor)}
+              onClick={() => updateQuantity(product.id, quantityInCart + 1, selectedColor, selectedSize)}
             >
               <Plus className="h-3.5 w-3.5" />
             </Button>
           </div>
         ) : (
           <Button 
-            onClick={() => addItem(product, 1, selectedColor)}
+            onClick={() => addItem(product, 1, selectedColor, selectedSize)}
             className="w-full text-xs sm:text-sm"
             size="sm"
           >
@@ -277,6 +304,31 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
                   </div>
                 </div>
               )}
+
+              {/* Selector de Tallas en el Modal */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="mb-8">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                    Talla seleccionada: <span className="text-foreground uppercase">{selectedSize}</span>
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={cn(
+                          "flex min-w-[48px] h-10 items-center justify-center rounded-lg border-2 text-sm font-black transition-all hover:bg-muted",
+                          selectedSize === size 
+                            ? "bg-primary text-white border-primary shadow-md scale-110" 
+                            : "bg-white text-muted-foreground border-muted-foreground/20 hover:border-muted-foreground/50"
+                        )}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-auto pt-4">
@@ -287,7 +339,7 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
                       variant="ghost"
                       size="icon"
                       className="h-10 w-10 hover:bg-white hover:shadow-sm rounded-lg"
-                      onClick={() => updateQuantity(product.id, quantityInCart - 1, selectedColor)}
+                      onClick={() => updateQuantity(product.id, quantityInCart - 1, selectedColor, selectedSize)}
                     >
                       <Minus className="h-5 w-5" />
                     </Button>
@@ -298,7 +350,7 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
                       variant="ghost"
                       size="icon"
                       className="h-10 w-10 hover:bg-white hover:shadow-sm rounded-lg"
-                      onClick={() => updateQuantity(product.id, quantityInCart + 1, selectedColor)}
+                      onClick={() => updateQuantity(product.id, quantityInCart + 1, selectedColor, selectedSize)}
                     >
                       <Plus className="h-5 w-5" />
                     </Button>
@@ -313,7 +365,7 @@ export function ProductCard({ product, userRole }: ProductCardProps) {
                 </div>
               ) : (
                 <Button 
-                  onClick={() => addItem(product, 1, selectedColor)}
+                  onClick={() => addItem(product, 1, selectedColor, selectedSize)}
                   className="w-full h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
                   size="lg"
                 >

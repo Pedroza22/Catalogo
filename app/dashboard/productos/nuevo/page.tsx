@@ -22,6 +22,8 @@ export default function NuevoProductoPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [colors, setColors] = useState<string[]>([])
   const [newColor, setNewColor] = useState('')
+  const [sizes, setSizes] = useState<string[]>([])
+  const [newSize, setNewSize] = useState('')
 
   useEffect(() => {
     getAllCategories().then(setCategories)
@@ -38,6 +40,17 @@ export default function NuevoProductoPage() {
     setColors(colors.filter(c => c !== color))
   }
 
+  const addSize = () => {
+    if (newSize && !sizes.includes(newSize)) {
+      setSizes([...sizes, newSize])
+      setNewSize('')
+    }
+  }
+
+  const removeSize = (size: string) => {
+    setSizes(sizes.filter(s => s !== size))
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -52,6 +65,9 @@ export default function NuevoProductoPage() {
 
     // Añadir colores
     formData.append('colors', colors.join(','))
+    
+    // Añadir tallas
+    formData.append('sizes', sizes.join(','))
 
     const result = await createProduct(formData)
 
@@ -161,6 +177,38 @@ export default function NuevoProductoPage() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">Agrega los colores disponibles para este producto.</p>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Tallas Disponibles</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {sizes.map((size) => (
+                  <div key={size} className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                    {size}
+                    <button type="button" onClick={() => removeSize(size)} className="hover:text-primary/70">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input 
+                  value={newSize} 
+                  onChange={(e) => setNewSize(e.target.value)} 
+                  placeholder="Ej: S, M, L, XL..." 
+                  className="max-w-[200px]"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addSize()
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" size="icon" onClick={addSize}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Agrega las tallas disponibles (ej: S, M, L o 38, 40, 42).</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">

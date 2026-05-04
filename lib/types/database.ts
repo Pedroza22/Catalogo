@@ -36,6 +36,8 @@ export interface Product {
   min_stock: number
   image_url: string | null
   is_active: boolean
+  colors?: string[]
+  sizes?: string[]
   created_at: string
   updated_at: string
   category?: Category
@@ -67,6 +69,7 @@ export interface OrderItem {
   unit_price: number
   subtotal: number
   selected_color: string | null
+  selected_size: string | null
   product?: Product
 }
 
@@ -101,4 +104,5 @@ export interface CartItem {
   product: Product
   quantity: number
   selected_color?: string | null
+  selected_size?: string | null
 }

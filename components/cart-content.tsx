@@ -93,7 +93,7 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
             <div className="bg-white rounded-2xl shadow-sm border p-1">
               {items.map((item, index) => (
                 <div 
-                  key={`${item.product.id}-${item.selected_color}`}
+                  key={`${item.product.id}-${item.selected_color}-${item.selected_size}`}
                   className={`p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center ${
                     index !== items.length - 1 ? 'border-b' : ''
                   }`}
@@ -125,6 +125,14 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                         </div>
                       </div>
                     )}
+                    {item.selected_size && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Talla:</span>
+                        <div className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
+                          {item.selected_size}
+                        </div>
+                      </div>
+                    )}
                     <p className="text-sm font-medium text-muted-foreground">
                       Precio unitario: <span className="text-foreground">{formatPrice(item.product.price)}</span>
                     </p>
@@ -135,7 +143,7 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-white hover:shadow-sm"
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.selected_color)}
+                          onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.selected_color, item.selected_size)}
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </Button>
@@ -146,7 +154,7 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-white hover:shadow-sm"
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selected_color)}
+                          onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selected_color, item.selected_size)}
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </Button>
@@ -155,8 +163,8 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 font-semibold text-xs gap-1.5"
-                        onClick={() => removeItem(item.product.id, item.selected_color)}
+                        className="text-destructive hover:text-destructive/80 hover:bg-destructive/5 text-xs font-bold uppercase tracking-wider"
+                        onClick={() => removeItem(item.product.id, item.selected_color, item.selected_size)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                         Eliminar

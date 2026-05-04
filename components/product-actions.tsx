@@ -95,8 +95,8 @@ export function ProductActions({ productId, productName, isActive, imageUrl }: P
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border-none shadow-2xl">
-          <div className="bg-primary px-4 py-3 pr-10">
-            <DialogTitle className="text-white text-sm font-bold truncate uppercase tracking-wide">
+          <div className="bg-primary px-4 py-3 pr-10 min-h-[48px] flex items-center">
+            <DialogTitle className="text-white text-sm font-bold uppercase tracking-wide leading-tight">
               {productName}
             </DialogTitle>
           </div>
