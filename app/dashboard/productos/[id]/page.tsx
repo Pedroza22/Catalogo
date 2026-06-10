@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { getProductById, updateProduct, deleteProduct, getAllCategories } from '@/lib/actions/products'
-import { ArrowLeft, Loader2, Trash2, X, Plus } from 'lucide-react'
+import { ArrowLeft, Loader2, Trash2, X, Plus, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Product, Category } from '@/lib/types/database'
 
@@ -20,6 +20,7 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
   const router = useRouter()
   const { id } = use(params)
   const [product, setProduct] = useState<Product | null>(null)
+  const [sku, setSku] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [colors, setColors] = useState<string[]>([])
@@ -45,6 +46,7 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
       }
 
       setProduct(prod)
+      setSku(prod.sku || '')
       setCategories(cats)
       setSelectedCategories(prod.categories?.map(c => c.id) || [])
       setColors(prod.colors || [])
@@ -54,6 +56,12 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
 
     fetchData()
   }, [id, router])
+
+  const generateSKU = () => {
+    const timestamp = Date.now().toString().slice(-6)
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    setSku(`PROD-${timestamp}${random}`)
+  }
 
   const addColor = () => {
     if (newColor && !colors.includes(newColor)) {
@@ -168,7 +176,24 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sku">SKU *</Label>
-                <Input id="sku" name="sku" defaultValue={product.sku || ''} required />
+                <div className="flex gap-2">
+                  <Input 
+                    id="sku" 
+                    name="sku" 
+                    value={sku} 
+                    onChange={(e) => setSku(e.target.value.toUpperCase())} 
+                    required 
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={generateSKU}
+                    title="Generar automáticamente"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
 

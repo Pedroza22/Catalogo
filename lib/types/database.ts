@@ -16,10 +16,26 @@ export interface Profile {
 export interface Category {
   id: string
   name: string
+  slug: string
   description: string | null
   image_url: string | null
+  parent_id: string | null
   is_active: boolean
   colors: string[]
+  created_at: string
+  subcategories?: Category[]
+}
+
+export interface Banner {
+  id: string
+  title: string
+  subtitle: string | null
+  image_url: string | null
+  background_color: string | null
+  button_text: string | null
+  button_link: string | null
+  is_active: boolean
+  order: number
   created_at: string
 }
 

@@ -32,7 +32,16 @@ export async function getCategories(): Promise<Category[]> {
       return []
     }
 
-    return data || []
+    const categories = data || []
+    
+    // Build hierarchy
+    const mainCategories = categories.filter(c => !c.parent_id)
+    const subCategories = categories.filter(c => c.parent_id)
+
+    return mainCategories.map(main => ({
+      ...main,
+      subcategories: subCategories.filter(sub => sub.parent_id === main.id)
+    }))
   } catch (err) {
     console.error('Unexpected error in getCategories:', err)
     return []
@@ -50,11 +59,19 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
       .order('name')
 
     if (categoryId) {
-      // Filtrar por categoría en la tabla intermedia
+      // 1. Obtener todas las subcategorías si categoryId es una principal
+      const { data: subcategories } = await supabase
+        .from('categories')
+        .select('id')
+        .or(`id.eq.${categoryId},parent_id.eq.${categoryId}`)
+      
+      const categoryIds = subcategories?.map(c => c.id) || [categoryId]
+
+      // 2. Filtrar por todas las categorías encontradas (principal + hijas)
       const { data: productIds, error: filterError } = await supabase
         .from('product_categories')
         .select('product_id')
-        .eq('category_id', categoryId)
+        .in('category_id', categoryIds)
       
       if (filterError) {
         console.error('Error filtering by category:', filterError)
@@ -63,6 +80,8 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
 
       if (productIds) {
         query = query.in('id', productIds.map(p => p.product_id))
+      } else {
+        return [] // No hay productos en estas categorías
       }
     }
 
@@ -381,7 +400,10 @@ export async function createCategory(formData: FormData) {
   
   const name = formData.get('name') as string
   const imageFile = formData.get('image_file') as File
-  let imageUrl = formData.get('image_url') as string || null
+  const isSub = formData.get('is_sub') === 'true'
+  const parentId = isSub ? (formData.get('parent_id') as string) : null
+  
+  let imageUrl = null
 
   if (imageFile && imageFile.size > 0) {
     const uploadedUrl = await uploadImage(imageFile, 'categories')
@@ -395,6 +417,7 @@ export async function createCategory(formData: FormData) {
     slug: generateSlug(name),
     description: formData.get('description') as string || null,
     image_url: imageUrl,
+    parent_id: parentId || null,
     is_active: true,
   }
 
@@ -405,6 +428,7 @@ export async function createCategory(formData: FormData) {
   }
 
   revalidateTag('categories')
+  revalidateTag('products') 
   return { success: true }
 }
 
@@ -412,6 +436,9 @@ export async function updateCategory(id: string, formData: FormData) {
   const supabase = await createClient()
   
   const imageFile = formData.get('image_file') as File
+  const isSub = formData.get('is_sub') === 'true'
+  const parentId = isSub ? (formData.get('parent_id') as string) : null
+  
   // Obtener la URL actual de la categoría
   const { data: currentCategory } = await supabase
     .from('categories')
@@ -433,6 +460,7 @@ export async function updateCategory(id: string, formData: FormData) {
     slug: generateSlug(formData.get('name') as string),
     description: formData.get('description') as string || null,
     image_url: imageUrl,
+    parent_id: parentId || null,
     is_active: formData.get('is_active') === 'true',
   }
 
@@ -446,6 +474,7 @@ export async function updateCategory(id: string, formData: FormData) {
   }
 
   revalidateTag('categories')
+  revalidateTag('products')
   return { success: true }
 }
 

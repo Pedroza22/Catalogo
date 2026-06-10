@@ -7,7 +7,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-secondary via-secondary to-secondary/90">
       <div className="container px-4 sm:px-6 py-10 sm:py-16 md:py-24">
-        <div className="grid gap-6 sm:gap-8 md:grid-cols-2 md:gap-12 items-center">
+        <div className="max-w-5xl mx-auto grid gap-6 sm:gap-8 md:grid-cols-2 md:gap-12 items-center">
           <div className="space-y-4 sm:space-y-6 text-center md:text-left">
             <div className="inline-block rounded-full bg-primary/10 px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-medium text-primary">
               Tu aliado comercial en Nariño

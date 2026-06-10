@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,9 +10,13 @@ import { Textarea } from '@/components/ui/textarea'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { getAllCategories, createCategory, updateCategory, deleteCategory } from '@/lib/actions/products'
-import { Plus, Tags, Loader2, Pencil, Trash2 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Plus, Tags, Loader2, Pencil, Trash2, FolderTree, ImageIcon, ChevronDown, ChevronRight } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { toast } from 'sonner'
 import type { Category } from '@/lib/types/database'
+import Image from 'next/image'
 
 export default function CategoriasPage() {
   const router = useRouter()
@@ -25,6 +29,19 @@ export default function CategoriasPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  
+  // Estado para controlar qué categorías principales están expandidas
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([])
+
+  const toggleCategory = (id: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+  
+  // Estados para controlar si es subcategoría en los diálogos
+  const [isSubcategoryNew, setIsSubcategoryNew] = useState(false)
+  const [isSubcategoryEdit, setIsSubcategoryEdit] = useState(false)
 
   useEffect(() => {
     getAllCategories().then((cats) => {
@@ -32,6 +49,12 @@ export default function CategoriasPage() {
       setLoading(false)
     })
   }, [])
+
+  useEffect(() => {
+    if (selectedCategory) {
+      setIsSubcategoryEdit(!!selectedCategory.parent_id)
+    }
+  }, [selectedCategory])
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -134,19 +157,38 @@ export default function CategoriasPage() {
                     <Label htmlFor="image_file">Subir Imagen</Label>
                     <Input id="image_file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
                   </div>
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">o usar URL</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="image_url">URL de Imagen</Label>
-                    <Input id="image_url" name="image_url" type="url" placeholder="https://..." />
-                  </div>
                 </div>
+
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
+                  <div className="space-y-0.5">
+                    <Label>¿Es una subcategoría?</Label>
+                    <p className="text-xs text-muted-foreground">Activa para asociarla a una principal</p>
+                  </div>
+                  <Switch 
+                    checked={isSubcategoryNew} 
+                    onCheckedChange={setIsSubcategoryNew}
+                  />
+                </div>
+
+                {isSubcategoryNew && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <Label htmlFor="parent_id">Seleccionar Categoría Principal</Label>
+                    <Select name="parent_id" defaultValue="">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Elegir principal..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories
+                          .filter(c => !c.parent_id)
+                          .map(cat => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))
+                        }
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <input type="hidden" name="is_sub" value={isSubcategoryNew ? "true" : "false"} />
                 {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
               <DialogFooter>
@@ -180,14 +222,57 @@ export default function CategoriasPage() {
                     <Label htmlFor="edit-description">Descripción</Label>
                     <Textarea id="edit-description" name="description" defaultValue={selectedCategory.description || ''} rows={3} />
                   </div>
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edit-image_url">URL de Imagen</Label>
-                    <Input id="edit-image_url" name="image_url" type="url" defaultValue={selectedCategory.image_url || ''} />
+                    <Label htmlFor="edit-image_file">Subir Imagen</Label>
+                    <Input id="edit-image_file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="edit-is_active" name="is_active" defaultChecked={selectedCategory.is_active} value="true" className="rounded border-gray-300" />
-                    <Label htmlFor="edit-is_active">Categoría Activa</Label>
+                </div>
+
+                {selectedCategory.image_url && (
+                  <div className="space-y-2">
+                    <Label>Imagen Actual</Label>
+                    <div className="relative h-32 w-full rounded-lg overflow-hidden border">
+                      <Image src={selectedCategory.image_url} alt="Preview" fill className="object-cover" />
+                    </div>
                   </div>
+                )}
+
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
+                  <div className="space-y-0.5">
+                    <Label>¿Es una subcategoría?</Label>
+                    <p className="text-xs text-muted-foreground">Activa para asociarla a una principal</p>
+                  </div>
+                  <Switch 
+                    checked={isSubcategoryEdit} 
+                    onCheckedChange={setIsSubcategoryEdit}
+                  />
+                </div>
+
+                {isSubcategoryEdit && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <Label htmlFor="edit-parent_id">Seleccionar Categoría Principal</Label>
+                    <Select name="parent_id" defaultValue={selectedCategory.parent_id || ''}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Elegir principal..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories
+                          .filter(c => c.id !== selectedCategory.id && !c.parent_id)
+                          .map(cat => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))
+                        }
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <input type="hidden" name="is_sub" value={isSubcategoryEdit ? "true" : "false"} />
+
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" id="edit-is_active" name="is_active" defaultChecked={selectedCategory.is_active} value="true" className="rounded border-gray-300" />
+                  <Label htmlFor="edit-is_active">Categoría Activa</Label>
+                </div>
                   {error && <p className="text-sm text-destructive">{error}</p>}
                 </div>
                 <DialogFooter>
@@ -225,6 +310,7 @@ export default function CategoriasPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[80px]">Imagen</TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Descripción</TableHead>
                   <TableHead>Estado</TableHead>
@@ -233,43 +319,147 @@ export default function CategoriasPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {categories.map((cat) => (
-                  <TableRow key={cat.id}>
-                    <TableCell className="font-medium">{cat.name}</TableCell>
-                    <TableCell className="text-muted-foreground line-clamp-1 max-w-[300px]">{cat.description || '-'}</TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cat.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {cat.is_active ? 'Activa' : 'Inactiva'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(cat.created_at).toLocaleDateString('es-CO')}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => {
-                            setSelectedCategory(cat)
-                            setEditDialogOpen(true)
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="text-destructive"
-                          onClick={() => handleDelete(cat.id)}
-                          disabled={deleting}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {categories
+                  .filter(c => !c.parent_id) // Primero las principales
+                  .map(parent => {
+                    const subcats = categories.filter(sub => sub.parent_id === parent.id)
+                    const isExpanded = expandedCategories.includes(parent.id)
+                    
+                    return (
+                      <React.Fragment key={parent.id}>
+                        <TableRow className="bg-muted/10 hover:bg-muted/20 transition-colors">
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {subcats.length > 0 && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-6 w-6" 
+                                  onClick={() => toggleCategory(parent.id)}
+                                >
+                                  {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                </Button>
+                              )}
+                              <div className="relative h-10 w-10 rounded-lg overflow-hidden border bg-white flex-shrink-0">
+                                {parent.image_url ? (
+                                  <Image src={parent.image_url} alt={parent.name} fill className="object-cover" />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center bg-muted">
+                                    <ImageIcon className="h-5 w-5 text-muted-foreground/50" />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-bold">
+                            <div className="flex items-center gap-2">
+                              <Tags className="h-4 w-4 text-primary" />
+                              {parent.name}
+                              {subcats.length > 0 && (
+                                <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">
+                                  {subcats.length} sub
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground font-normal line-clamp-1 mt-0.5">
+                              {parent.description || 'Sin descripción'}
+                            </p>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${parent.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                              {parent.is_active ? 'Activa' : 'Inactiva'}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs hidden sm:table-cell">
+                            {new Date(parent.created_at).toLocaleDateString('es-CO')}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  setSelectedCategory(parent)
+                                  setEditDialogOpen(true)
+                                }}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDelete(parent.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        
+                        {/* Subcategorías desplegables */}
+                        {isExpanded && subcats.map(sub => (
+                          <TableRow key={sub.id} className="bg-white hover:bg-primary/5 transition-colors border-l-4 border-l-primary/40">
+                            <TableCell>
+                              <div className="flex items-center gap-2 pl-8">
+                                <div className="relative h-8 w-8 rounded-lg overflow-hidden border bg-white flex-shrink-0">
+                                  {sub.image_url ? (
+                                    <Image src={sub.image_url} alt={sub.name} fill className="object-cover" />
+                                  ) : (
+                                    <div className="flex h-full items-center justify-center bg-muted">
+                                      <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="pl-4">
+                              <div className="flex items-center gap-2">
+                                <FolderTree className="h-3.5 w-3.5 text-muted-foreground" />
+                                <span className="font-medium text-sm">{sub.name}</span>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground italic line-clamp-1 mt-0.5">
+                                {sub.description || 'Sin descripción'}
+                              </p>
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${sub.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-700'}`}>
+                                {sub.is_active ? 'Activa' : 'Inactiva'}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-[10px] hidden sm:table-cell">
+                              {new Date(sub.created_at).toLocaleDateString('es-CO')}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7"
+                                  onClick={() => {
+                                    setSelectedCategory(sub)
+                                    setEditDialogOpen(true)
+                                  }}
+                                >
+                                  <Pencil className="h-3 w-3" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  onClick={() => handleDelete(sub.id)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </React.Fragment>
+                    )
+                  })
+                }
               </TableBody>
             </Table>
           )}

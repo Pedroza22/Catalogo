@@ -1,8 +1,14 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
-import { Layers } from 'lucide-react'
+import { Layers, ChevronRight } from 'lucide-react'
 import type { Category } from '@/lib/types/database'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface CategoriesSectionProps {
   categories: Category[]
@@ -33,31 +39,76 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">Categorías</h2>
           <p className="text-muted-foreground mt-2 sm:mt-3 text-base sm:text-lg">Explora nuestras categorías de productos</p>
         </div>
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
           {categories.map((category) => (
-            <Link key={category.id} href={`/catalogo?categoria=${category.id}`}>
-              <Card className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-muted/60">
-                <CardContent className="p-3 sm:p-5 text-center flex flex-col h-full">
-                  <div className="relative w-full aspect-square mb-3 sm:mb-4 rounded-xl overflow-hidden bg-muted/30 flex-shrink-0">
-                    {category.image_url ? (
-                      <Image
-                        src={category.image_url}
-                        alt={category.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <Layers className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground/30 transition-transform duration-500 group-hover:scale-110 group-hover:text-primary/50" />
+            <div key={category.id} className="relative group">
+              {category.subcategories && category.subcategories.length > 0 ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-muted/60 h-full">
+                      <CardContent className="p-3 sm:p-5 text-center flex flex-col h-full">
+                        <div className="relative w-full aspect-square mb-3 sm:mb-4 rounded-xl overflow-hidden bg-muted/30 flex-shrink-0">
+                          {category.image_url ? (
+                            <Image
+                              src={category.image_url}
+                              alt={category.name}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <Layers className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground/30 transition-transform duration-500 group-hover:scale-110 group-hover:text-primary/50" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow flex items-center justify-center gap-1">
+                          <h3 className="font-bold text-foreground text-sm sm:text-base md:text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">{category.name}</h3>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform group-data-[state=open]:rotate-90" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-56">
+                    <Link href={`/catalogo?categoria=${category.id}`}>
+                      <DropdownMenuItem className="font-bold">
+                        Ver todo en {category.name}
+                      </DropdownMenuItem>
+                    </Link>
+                    {category.subcategories.map((sub) => (
+                      <Link key={sub.id} href={`/catalogo?categoria=${sub.id}`}>
+                        <DropdownMenuItem>
+                          {sub.name}
+                        </DropdownMenuItem>
+                      </Link>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href={`/catalogo?categoria=${category.id}`}>
+                  <Card className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-muted/60 h-full">
+                    <CardContent className="p-3 sm:p-5 text-center flex flex-col h-full">
+                      <div className="relative w-full aspect-square mb-3 sm:mb-4 rounded-xl overflow-hidden bg-muted/30 flex-shrink-0">
+                        {category.image_url ? (
+                          <Image
+                            src={category.image_url}
+                            alt={category.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center">
+                            <Layers className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground/30 transition-transform duration-500 group-hover:scale-110 group-hover:text-primary/50" />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex-grow flex items-center justify-center">
-                    <h3 className="font-bold text-foreground text-sm sm:text-base md:text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">{category.name}</h3>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                      <div className="flex-grow flex items-center justify-center">
+                        <h3 className="font-bold text-foreground text-sm sm:text-base md:text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">{category.name}</h3>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )}
+            </div>
           ))}
         </div>
       </div>

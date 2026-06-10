@@ -11,23 +11,33 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { createProduct, getAllCategories } from '@/lib/actions/products'
-import { ArrowLeft, Loader2, X, Plus } from 'lucide-react'
-import type { Category } from '@/lib/types/database'
+import { ArrowLeft, Loader2, X, Plus, RefreshCw } from 'lucide-react'
 
 export default function NuevoProductoPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  interface Category {
+    id: string;
+    name: string;
+  }
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [colors, setColors] = useState<string[]>([])
   const [newColor, setNewColor] = useState('')
   const [sizes, setSizes] = useState<string[]>([])
   const [newSize, setNewSize] = useState('')
+  const [sku, setSku] = useState('')
 
   useEffect(() => {
     getAllCategories().then(setCategories)
   }, [])
+
+  const generateSKU = () => {
+    const timestamp = Date.now().toString().slice(-6)
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    setSku(`PROD-${timestamp}${random}`)
+  }
 
   const addColor = () => {
     if (newColor && !colors.includes(newColor)) {
@@ -108,7 +118,25 @@ export default function NuevoProductoPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sku">SKU *</Label>
-                <Input id="sku" name="sku" required placeholder="Código único" />
+                <div className="flex gap-2">
+                  <Input 
+                    id="sku" 
+                    name="sku" 
+                    value={sku} 
+                    onChange={(e) => setSku(e.target.value.toUpperCase())} 
+                    required 
+                    placeholder="Código único" 
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={generateSKU}
+                    title="Generar automáticamente"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
 
