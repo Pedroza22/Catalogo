@@ -206,6 +206,7 @@ export async function createProduct(formData: FormData) {
   }
 
   const price = parseFloat(formData.get('price') as string)
+  const cost_price = parseFloat(formData.get('cost_price') as string) || 0
   const stock = parseInt(formData.get('stock') as string)
   const min_stock = parseInt(formData.get('min_stock') as string)
 
@@ -215,6 +216,7 @@ export async function createProduct(formData: FormData) {
     description: formData.get('description') as string,
     sku: formData.get('sku') as string,
     price: isNaN(price) ? 0 : price,
+    cost_price: isNaN(cost_price) ? 0 : cost_price,
     stock: isNaN(stock) ? 0 : stock,
     min_stock: isNaN(min_stock) ? 5 : min_stock,
     image_url: imageUrl,
@@ -230,6 +232,14 @@ export async function createProduct(formData: FormData) {
     .single()
 
   if (error) {
+    if (error.code === '23505') {
+      if (error.message.includes('sku')) {
+        return { error: 'Ya existe un producto con este SKU. Por favor usa uno diferente.' }
+      }
+      if (error.message.includes('slug')) {
+        return { error: 'Ya existe un producto con un nombre muy similar. Por favor cámbialo ligeramente.' }
+      }
+    }
     return { error: error.message }
   }
 
@@ -279,6 +289,7 @@ export async function updateProduct(id: string, formData: FormData) {
   }
 
   const price = parseFloat(formData.get('price') as string)
+  const cost_price = parseFloat(formData.get('cost_price') as string) || 0
   const stock = parseInt(formData.get('stock') as string)
   const min_stock = parseInt(formData.get('min_stock') as string)
 
@@ -287,6 +298,7 @@ export async function updateProduct(id: string, formData: FormData) {
     description: formData.get('description') as string,
     sku: formData.get('sku') as string,
     price: isNaN(price) ? 0 : price,
+    cost_price: isNaN(cost_price) ? 0 : cost_price,
     stock: isNaN(stock) ? 0 : stock,
     min_stock: isNaN(min_stock) ? 5 : min_stock,
     image_url: imageUrl,
@@ -304,6 +316,14 @@ export async function updateProduct(id: string, formData: FormData) {
 
   if (error) {
     console.error('[updateProduct] Error al actualizar producto en base de datos:', error);
+    if (error.code === '23505') {
+      if (error.message.includes('sku')) {
+        return { error: 'Ya existe otro producto con este SKU. Por favor usa uno diferente.' }
+      }
+      if (error.message.includes('slug')) {
+        return { error: 'Ya existe otro producto con un nombre muy similar. Por favor cámbialo ligeramente.' }
+      }
+    }
     return { error: error.message }
   }
 
