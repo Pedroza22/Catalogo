@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidateTag } from 'next/cache'
+import { updateTag } from 'next/cache'
 import type { Product, Category } from '@/lib/types/database'
 
 function generateSlug(text: string): string {
@@ -253,7 +253,7 @@ export async function createProduct(formData: FormData) {
     await supabase.from('product_categories').insert(productCategories)
   }
 
-  revalidateTag('products')
+  updateTag('products')
   return { success: true }
 }
 
@@ -351,7 +351,7 @@ export async function updateProduct(id: string, formData: FormData) {
     }
   }
 
-  revalidateTag('products')
+  updateTag('products')
   return { success: true }
 }
 
@@ -367,7 +367,7 @@ export async function deleteProduct(id: string) {
     return { error: error.message }
   }
 
-  revalidateTag('products')
+  updateTag('products')
   return { success: true }
 }
 
@@ -395,7 +395,7 @@ export async function hardDeleteProduct(id: string) {
     return { error: error.message }
   }
 
-  revalidateTag('products')
+  updateTag('products')
   return { success: true }
 }
 
@@ -411,7 +411,7 @@ export async function toggleProductStatus(id: string, isActive: boolean) {
     return { error: error.message }
   }
 
-  revalidateTag('products')
+  updateTag('products')
   return { success: true }
 }
 
@@ -447,8 +447,8 @@ export async function createCategory(formData: FormData) {
     return { error: error.message }
   }
 
-  revalidateTag('categories')
-  revalidateTag('products') 
+  updateTag('categories')
+  updateTag('products') 
   return { success: true }
 }
 
@@ -493,8 +493,8 @@ export async function updateCategory(id: string, formData: FormData) {
     return { error: error.message }
   }
 
-  revalidateTag('categories')
-  revalidateTag('products')
+  updateTag('categories')
+  updateTag('products')
   return { success: true }
 }
 
@@ -510,7 +510,7 @@ export async function deleteCategory(id: string) {
     return { error: error.message }
   }
 
-  revalidateTag('categories')
+  updateTag('categories')
   return { success: true }
 }
 
