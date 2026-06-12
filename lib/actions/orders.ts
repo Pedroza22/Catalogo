@@ -83,7 +83,7 @@ export async function createOrder(
     }
   }
 
-  revalidateTag('orders', 'max')
+  revalidateTag('orders')
   return { success: true, orderId: order.id }
 }
 
@@ -165,7 +165,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     }
   }
 
-  revalidateTag('orders', 'max')
+  revalidateTag('orders')
   return { success: true }
 }
 

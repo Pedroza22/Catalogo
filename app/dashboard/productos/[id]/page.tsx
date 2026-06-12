@@ -296,9 +296,13 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
               <p className="text-xs text-muted-foreground">Modifica las tallas disponibles (ej: S, M, L o 38, 40, 42).</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Precio *</Label>
+                <Label htmlFor="cost_price">Precio de Costo</Label>
+                <Input id="cost_price" name="cost_price" type="number" min="0" step="any" defaultValue={product.cost_price} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Precio de Venta *</Label>
                 <Input id="price" name="price" type="number" min="0" step="any" defaultValue={product.price} required />
               </div>
               <div className="space-y-2">

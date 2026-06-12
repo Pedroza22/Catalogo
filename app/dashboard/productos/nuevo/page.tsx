@@ -239,9 +239,13 @@ export default function NuevoProductoPage() {
               <p className="text-xs text-muted-foreground">Agrega las tallas disponibles (ej: S, M, L o 38, 40, 42).</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Precio *</Label>
+                <Label htmlFor="cost_price">Precio de Costo</Label>
+                <Input id="cost_price" name="cost_price" type="number" min="0" step="any" placeholder="0" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Precio de Venta *</Label>
                 <Input id="price" name="price" type="number" min="0" step="any" required placeholder="0" />
               </div>
               <div className="space-y-2">

@@ -171,13 +171,12 @@ async function processSqlFile() {
         const categoryId = categoryMap.get(p.categoryName)
         
         // 1. Insertar o actualizar el producto
-        const { data: product, error: prodError } = await sql`
+        const product = await sql`
           INSERT INTO public.products 
             (sku, name, slug, cost_price, price, stock, min_stock, is_active)
           VALUES 
             (${p.sku}, ${p.name}, ${p.slug}, ${p.cost_price}, ${p.price}, ${p.stock}, ${p.min_stock}, ${p.is_active})
-          ON CONFLICT (slug) DO UPDATE SET
-            sku = EXCLUDED.sku,
+          ON CONFLICT (sku) DO UPDATE SET
             name = EXCLUDED.name,
             cost_price = EXCLUDED.cost_price,
             price = EXCLUDED.price,
