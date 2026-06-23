@@ -39,6 +39,20 @@ export interface Banner {
   created_at: string
 }
 
+export interface ProductVariant {
+  id: string
+  product_id: string
+  size?: string | null
+  color?: string | null
+  price: number
+  cost_price: number
+  stock: number
+  sku?: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface Product {
   id: string
   category_id: string | null
@@ -58,6 +72,7 @@ export interface Product {
   updated_at: string
   category?: Category
   categories?: Category[]
+  variants?: ProductVariant[]
 }
 
 export type OrderStatus = 'pendiente' | 'preparando' | 'despachado' | 'entregado' | 'cancelado'

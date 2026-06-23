@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { updateTag } from 'next/cache'
-import type { Product, Category } from '@/lib/types/database'
+import type { Product, Category, ProductVariant } from '@/lib/types/database'
 
 function generateSlug(text: string): string {
   return text
@@ -253,6 +253,17 @@ export async function createProduct(formData: FormData) {
     await supabase.from('product_categories').insert(productCategories)
   }
 
+  // Handle product variants
+  const variantsJson = formData.get('variants') as string
+  if (variantsJson) {
+    try {
+      const variants = JSON.parse(variantsJson)
+      await upsertProductVariants(newProduct.id, variants)
+    } catch (e) {
+      console.error('Error parsing variants JSON:', e)
+    }
+  }
+
   updateTag('products')
   return { success: true }
 }
@@ -348,6 +359,17 @@ export async function updateProduct(id: string, formData: FormData) {
     const { error: insertError } = await supabase.from('product_categories').insert(productCategories)
     if (insertError) {
       console.error('Error inserting new categories:', insertError)
+    }
+  }
+
+  // Handle product variants
+  const variantsJson = formData.get('variants') as string
+  if (variantsJson) {
+    try {
+      const variants = JSON.parse(variantsJson)
+      await upsertProductVariants(id, variants)
+    } catch (e) {
+      console.error('Error parsing variants JSON:', e)
     }
   }
 
@@ -528,4 +550,140 @@ export async function getAllCategories(): Promise<Category[]> {
   }
 
   return data || []
+}
+
+// ========== PRODUCT VARIANTS FUNCTIONS ==========
+
+export async function getProductVariants(productId: string): Promise<ProductVariant[]> {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('product_variants')
+    .select('*')
+    .eq('product_id', productId)
+    .order('size')
+    .order('color')
+
+  if (error) {
+    console.error('Error fetching product variants:', error)
+    return []
+  }
+
+  return data || []
+}
+
+export async function getProductWithVariants(id: string): Promise<Product | null> {
+  const supabase = await createClient()
+  
+  const { data: product, error: productError } = await supabase
+    .from('products')
+    .select('*, product_categories(categories(*))')
+    .eq('id', id)
+    .single()
+
+  if (productError) {
+    console.error('Error fetching product:', productError)
+    return null
+  }
+
+  const variants = await getProductVariants(id)
+
+  return {
+    ...product,
+    categories: product.product_categories?.map((pc: any) => pc.categories).filter(Boolean) || [],
+    variants
+  }
+}
+
+export async function createProductVariant(variant: Omit<ProductVariant, 'id' | 'created_at' | 'updated_at'>) {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('product_variants')
+    .insert(variant)
+    .select('*')
+    .single()
+
+  if (error) {
+    console.error('Error creating product variant:', error)
+    return { error: error.message }
+  }
+
+  updateTag('products')
+  return { success: true, variant: data }
+}
+
+export async function updateProductVariant(id: string, variant: Partial<Omit<ProductVariant, 'id' | 'created_at' | 'updated_at'>>) {
+  const supabase = await createClient()
+  
+  const { error } = await supabase
+    .from('product_variants')
+    .update(variant)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error updating product variant:', error)
+    return { error: error.message }
+  }
+
+  updateTag('products')
+  return { success: true }
+}
+
+export async function deleteProductVariant(id: string) {
+  const supabase = await createClient()
+  
+  const { error } = await supabase
+    .from('product_variants')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error deleting product variant:', error)
+    return { error: error.message }
+  }
+
+  updateTag('products')
+  return { success: true }
+}
+
+export async function upsertProductVariants(productId: string, variants: Array<Partial<ProductVariant>>) {
+  const supabase = await createClient()
+  
+  // Delete existing variants first
+  const { error: deleteError } = await supabase
+    .from('product_variants')
+    .delete()
+    .eq('product_id', productId)
+
+  if (deleteError) {
+    console.error('Error deleting existing variants:', deleteError)
+    return { error: deleteError.message }
+  }
+
+  // Insert new variants if any
+  if (variants.length > 0) {
+    const variantsToInsert = variants.map(v => ({
+      product_id: productId,
+      size: v.size,
+      color: v.color,
+      price: v.price || 0,
+      cost_price: v.cost_price || 0,
+      stock: v.stock || 0,
+      sku: v.sku,
+      is_active: v.is_active !== false
+    }))
+
+    const { error: insertError } = await supabase
+      .from('product_variants')
+      .insert(variantsToInsert)
+
+    if (insertError) {
+      console.error('Error inserting variants:', insertError)
+      return { error: insertError.message }
+    }
+  }
+
+  updateTag('products')
+  return { success: true }
 }
