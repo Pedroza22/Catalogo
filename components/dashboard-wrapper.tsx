@@ -20,7 +20,7 @@ export function DashboardWrapper({ profile, children }: DashboardWrapperProps) {
           ? "lg:ml-16 min-h-screen pt-14 lg:pt-0 transition-all duration-300"
           : "lg:ml-64 min-h-screen pt-14 lg:pt-0 transition-all duration-300"
       }>
-        <div className="p-1 sm:p-2 lg:p-4">
+        <div className="p-1 sm:p-1 lg:p-0">
           {children}
         </div>
       </main>
