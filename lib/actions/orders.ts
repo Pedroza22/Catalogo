@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidateTag } from 'next/cache'
+import { updateTag } from 'next/cache'
 import type { Order, OrderStatus, PaymentMethod, CartItem } from '@/lib/types/database'
 
 export async function createOrder(
@@ -83,7 +83,7 @@ export async function createOrder(
     }
   }
 
-  revalidateTag('orders')
+  updateTag('orders')
   return { success: true, orderId: order.id }
 }
 
@@ -165,7 +165,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     }
   }
 
-  revalidateTag('orders')
+  updateTag('orders')
   return { success: true }
 }
 
