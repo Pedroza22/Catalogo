@@ -104,7 +104,7 @@ export default function NuevoProductoPage() {
         </div>
       </div>
 
-      <Card className="max-w-2xl">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Información del Producto</CardTitle>
           <CardDescription>Completa los datos del nuevo producto</CardDescription>

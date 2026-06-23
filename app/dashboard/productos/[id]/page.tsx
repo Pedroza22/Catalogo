@@ -162,7 +162,7 @@ export default function EditarProductoPage({ params }: { params: Promise<{ id: s
         </Button>
       </div>
 
-      <Card className="max-w-2xl">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Información del Producto</CardTitle>
           <CardDescription>Modifica los datos del producto</CardDescription>
