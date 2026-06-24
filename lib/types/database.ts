@@ -44,6 +44,7 @@ export interface ProductVariant {
   product_id: string
   size?: string | null
   color?: string | null
+  fragrance?: string | null
   price: number
   cost_price: number
   stock: number

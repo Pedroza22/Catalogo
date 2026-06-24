@@ -15,24 +15,17 @@ function generateSlug(text: string): string {
 
 export async function getCategories(): Promise<Category[]> {
   try {
-    const supabase = await createClient()
+    // Importamos getAllCategories desde categories.ts para evitar duplicación
+    const { getAllCategories } = await import('./categories')
+    const categories = await getAllCategories()
     
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name')
-
-    if (error) {
-      console.error('Error fetching categories detail:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      })
-      return []
-    }
-
-    return data || []
+    // Build hierarchy - categorías principales con sus subcategorías
+    const mainCategories = categories.filter(c => !c.parent_id)
+    
+    return mainCategories.map(main => ({
+      ...main,
+      subcategories: categories.filter(sub => sub.parent_id === main.id)
+    }))
   } catch (err) {
     console.error('Unexpected error in getCategories:', err)
     return []
@@ -658,6 +651,7 @@ export async function upsertProductVariants(productId: string, variants: Array<P
       product_id: productId,
       size: v.size,
       color: v.color,
+      fragrance: v.fragrance,
       price: v.price || 0,
       cost_price: v.cost_price || 0,
       stock: v.stock || 0,

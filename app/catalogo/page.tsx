@@ -2,7 +2,8 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { ProductCard } from '@/components/product-card'
 import { getProfile } from '@/lib/actions/auth'
-import { getProducts, getCategories } from '@/lib/actions/products'
+import { getProducts } from '@/lib/actions/products'
+import { getAllCategories } from '@/lib/actions/categories'
 import { CategoryFilter } from '@/components/category-filter'
 import { ProductSearch } from '@/components/product-search'
 import { Package } from 'lucide-react'
@@ -16,7 +17,7 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
   const [profile, products, categories] = await Promise.all([
     getProfile(),
     getProducts(params.categoria),
-    getCategories()
+    getAllCategories()
   ])
 
   const user = profile ? { email: profile.email, role: profile.role } : null
