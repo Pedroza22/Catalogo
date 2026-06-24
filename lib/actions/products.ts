@@ -32,16 +32,7 @@ export async function getCategories(): Promise<Category[]> {
       return []
     }
 
-    const categories = data || []
-    
-    // Build hierarchy
-    const mainCategories = categories.filter(c => !c.parent_id)
-    const subCategories = categories.filter(c => c.parent_id)
-
-    return mainCategories.map(main => ({
-      ...main,
-      subcategories: subCategories.filter(sub => sub.parent_id === main.id)
-    }))
+    return data || []
   } catch (err) {
     console.error('Unexpected error in getCategories:', err)
     return []
