@@ -310,11 +310,12 @@ export default function CategoriasPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[40px]"></TableHead>
                   <TableHead className="w-[80px]">Imagen</TableHead>
                   <TableHead>Nombre</TableHead>
-                  <TableHead>Descripción</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Creada</TableHead>
+                  <TableHead className="hidden md:table-cell">Descripción</TableHead>
+                  <TableHead className="hidden md:table-cell">Estado</TableHead>
+                  <TableHead className="hidden sm:table-cell">Creada</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -329,26 +330,26 @@ export default function CategoriasPage() {
                       <React.Fragment key={parent.id}>
                         <TableRow className="bg-muted/10 hover:bg-muted/20 transition-colors">
                           <TableCell>
-                            <div className="flex items-center gap-2">
-                              {subcats.length > 0 && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-6 w-6" 
-                                  onClick={() => toggleCategory(parent.id)}
-                                >
-                                  {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                                </Button>
+                            {subcats.length > 0 && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6" 
+                                onClick={() => toggleCategory(parent.id)}
+                              >
+                                {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                              </Button>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="relative h-10 w-10 rounded-lg overflow-hidden border bg-white flex-shrink-0">
+                              {parent.image_url ? (
+                                <Image src={parent.image_url} alt={parent.name} fill className="object-cover" />
+                              ) : (
+                                <div className="flex h-full items-center justify-center bg-muted">
+                                  <ImageIcon className="h-5 w-5 text-muted-foreground/50" />
+                                </div>
                               )}
-                              <div className="relative h-10 w-10 rounded-lg overflow-hidden border bg-white flex-shrink-0">
-                                {parent.image_url ? (
-                                  <Image src={parent.image_url} alt={parent.name} fill className="object-cover" />
-                                ) : (
-                                  <div className="flex h-full items-center justify-center bg-muted">
-                                    <ImageIcon className="h-5 w-5 text-muted-foreground/50" />
-                                  </div>
-                                )}
-                              </div>
                             </div>
                           </TableCell>
                           <TableCell className="font-bold">
@@ -361,7 +362,9 @@ export default function CategoriasPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground font-normal line-clamp-1 mt-0.5">
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <p className="text-xs text-muted-foreground font-normal line-clamp-1">
                               {parent.description || 'Sin descripción'}
                             </p>
                           </TableCell>
@@ -400,35 +403,38 @@ export default function CategoriasPage() {
                         
                         {/* Subcategorías desplegables */}
                         {isExpanded && subcats.map(sub => (
-                          <TableRow key={sub.id} className="bg-white hover:bg-primary/5 transition-colors border-l-4 border-l-primary/40">
+                          <TableRow key={sub.id} className="bg-white hover:bg-primary/5 transition-colors">
                             <TableCell>
-                              <div className="flex items-center gap-2 pl-8">
-                                <div className="relative h-8 w-8 rounded-lg overflow-hidden border bg-white flex-shrink-0">
-                                  {sub.image_url ? (
-                                    <Image src={sub.image_url} alt={sub.name} fill className="object-cover" />
-                                  ) : (
-                                    <div className="flex h-full items-center justify-center bg-muted">
-                                      <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
-                                    </div>
-                                  )}
-                                </div>
+                              {/* Espacio para alinear con las categorías principales */}
+                            </TableCell>
+                            <TableCell>
+                              <div className="relative h-8 w-8 rounded-lg overflow-hidden border bg-white flex-shrink-0">
+                                {sub.image_url ? (
+                                  <Image src={sub.image_url} alt={sub.name} fill className="object-cover" />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center bg-muted">
+                                    <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
+                                  </div>
+                                )}
                               </div>
                             </TableCell>
-                            <TableCell className="pl-4">
-                              <div className="flex items-center gap-2">
+                            <TableCell>
+                              <div className="flex items-center gap-2 pl-6">
                                 <FolderTree className="h-3.5 w-3.5 text-muted-foreground" />
                                 <span className="font-medium text-sm">{sub.name}</span>
                               </div>
-                              <p className="text-[11px] text-muted-foreground italic line-clamp-1 mt-0.5">
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              <p className="text-xs text-muted-foreground italic line-clamp-1">
                                 {sub.description || 'Sin descripción'}
                               </p>
                             </TableCell>
                             <TableCell className="hidden md:table-cell">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${sub.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-700'}`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                 {sub.is_active ? 'Activa' : 'Inactiva'}
                               </span>
                             </TableCell>
-                            <TableCell className="text-muted-foreground text-[10px] hidden sm:table-cell">
+                            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell">
                               {new Date(sub.created_at).toLocaleDateString('es-CO')}
                             </TableCell>
                             <TableCell className="text-right">
@@ -436,21 +442,21 @@ export default function CategoriasPage() {
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  className="h-7 w-7"
+                                  className="h-8 w-8"
                                   onClick={() => {
                                     setSelectedCategory(sub)
                                     setEditDialogOpen(true)
                                   }}
                                 >
-                                  <Pencil className="h-3 w-3" />
+                                  <Pencil className="h-3.5 w-3.5" />
                                 </Button>
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                                   onClick={() => handleDelete(sub.id)}
                                 >
-                                  <Trash2 className="h-3 w-3" />
+                                  <Trash2 className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
                             </TableCell>

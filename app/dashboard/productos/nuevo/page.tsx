@@ -30,9 +30,11 @@ export default function NuevoProductoPage() {
   const [newColor, setNewColor] = useState('')
   const [sizes, setSizes] = useState<string[]>([])
   const [newSize, setNewSize] = useState('')
+  const [fragrances, setFragrances] = useState<string[]>([])
+  const [newFragrance, setNewFragrance] = useState('')
   const [sku, setSku] = useState('')
   const [variants, setVariants] = useState<Array<Partial<ProductVariant>>>([
-    { size: '', color: '', price: 0, cost_price: 0, stock: 0, sku: '', is_active: true }
+    { size: '', color: '', fragrance: '', price: 0, cost_price: 0, stock: 0, sku: '', is_active: true }
   ])
 
   useEffect(() => {
@@ -67,8 +69,19 @@ export default function NuevoProductoPage() {
     setSizes(sizes.filter(s => s !== size))
   }
 
+  const addFragrance = () => {
+    if (newFragrance && !fragrances.includes(newFragrance)) {
+      setFragrances([...fragrances, newFragrance])
+      setNewFragrance('')
+    }
+  }
+
+  const removeFragrance = (fragrance: string) => {
+    setFragrances(fragrances.filter(f => f !== fragrance))
+  }
+
   const addVariant = () => {
-    setVariants([...variants, { size: '', color: '', price: 0, cost_price: 0, stock: 0, sku: '', is_active: true }])
+    setVariants([...variants, { size: '', color: '', fragrance: '', price: 0, cost_price: 0, stock: 0, sku: '', is_active: true }])
   }
 
   const removeVariant = (index: number) => {
@@ -100,6 +113,9 @@ export default function NuevoProductoPage() {
     
     // Añadir tallas
     formData.append('sizes', sizes.join(','))
+    
+    // Añadir fragancias (guardamos como un array, aunque el modelo no lo tenga, lo podemos usar en variantes)
+    // No lo guardamos en el producto principal, lo usamos solo en variantes
 
     // Añadir variantes si usamos variantes
     if (useVariants) {
@@ -208,7 +224,7 @@ export default function NuevoProductoPage() {
                 checked={useVariants}
                 onCheckedChange={setUseVariants}
               />
-              <Label htmlFor="useVariants">Usar variantes (tallas/colores con precios diferentes)</Label>
+              <Label htmlFor="useVariants">Usar variantes (tallas/colores/fragancias con precios diferentes)</Label>
             </div>
 
             {!useVariants ? (
@@ -277,6 +293,38 @@ export default function NuevoProductoPage() {
                   <p className="text-xs text-muted-foreground">Agrega las tallas disponibles (ej: S, M, L o 38, 40, 42).</p>
                 </div>
 
+                <div className="space-y-3">
+                  <Label>Fragancias / Aromas Disponibles</Label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {fragrances.map((fragrance) => (
+                      <div key={fragrance} className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                        {fragrance}
+                        <button type="button" onClick={() => removeFragrance(fragrance)} className="hover:text-primary/70">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input 
+                      value={newFragrance} 
+                      onChange={(e) => setNewFragrance(e.target.value)} 
+                      placeholder="Ej: Lavanda, Vainilla, Cítrico..." 
+                      className="max-w-[200px]"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          addFragrance()
+                        }
+                      }}
+                    />
+                    <Button type="button" variant="outline" size="icon" onClick={addFragrance}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Agrega las fragancias/aromas disponibles para este producto.</p>
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-4">
                   <div className="space-y-2">
                     <Label htmlFor="cost_price">Precio de Costo</Label>
@@ -311,6 +359,7 @@ export default function NuevoProductoPage() {
                         <tr>
                           <th className="px-4 py-2 text-left text-sm font-medium">Talla</th>
                           <th className="px-4 py-2 text-left text-sm font-medium">Color</th>
+                          <th className="px-4 py-2 text-left text-sm font-medium">Fragancia</th>
                           <th className="px-4 py-2 text-left text-sm font-medium">SKU</th>
                           <th className="px-4 py-2 text-left text-sm font-medium">Precio Costo</th>
                           <th className="px-4 py-2 text-left text-sm font-medium">Precio Venta *</th>
@@ -334,6 +383,13 @@ export default function NuevoProductoPage() {
                                 value={variant.color || ''} 
                                 onChange={(e) => updateVariant(index, 'color', e.target.value)}
                                 placeholder="Rojo, Azul..."
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <Input 
+                                value={variant.fragrance || ''} 
+                                onChange={(e) => updateVariant(index, 'fragrance', e.target.value)}
+                                placeholder="Lavanda, Vainilla..."
                               />
                             </td>
                             <td className="px-4 py-2">
