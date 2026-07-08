@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Layers, ChevronRight } from 'lucide-react'
 import type { Category } from '@/lib/types/database'
 import {
@@ -45,8 +46,8 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
               {category.subcategories && category.subcategories.length > 0 ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-muted/60 h-full">
-                      <CardContent className="p-3 sm:p-5 text-center flex flex-col h-full">
+                    <Button variant='ghost' className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-muted/60 rounded-xl bg-card text-card-foreground flex flex-col gap-0 h-full p-0 w-full">
+                      <div className="p-3 sm:p-5 text-center flex flex-col h-full w-full">
                         <div className="relative w-full aspect-square mb-3 sm:mb-4 rounded-xl overflow-hidden bg-muted/30 flex-shrink-0">
                           {category.image_url ? (
                             <Image
@@ -65,8 +66,8 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
                           <h3 className="font-bold text-foreground text-sm sm:text-base md:text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">{category.name}</h3>
                           <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform group-data-[state=open]:rotate-90" />
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="center" className="w-56">
                     <Link href={`/catalogo?categoria=${category.id}`}>

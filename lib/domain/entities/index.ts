@@ -9,6 +9,7 @@ export interface User {
   fullName: string | null
   phone: string | null
   address: string | null
+  isInCity: boolean
   creditLimit: number
   creditUsed: number
   isActive: boolean
@@ -21,8 +22,10 @@ export interface Category {
   slug: string
   description: string | null
   imageUrl: string | null
+  parentId: string | null
   isActive: boolean
   createdAt: Date
+  deliveryPolicy?: CategoryDeliveryPolicy
 }
 
 export interface Product {
@@ -54,6 +57,9 @@ export interface Order {
   total: number
   notes: string | null
   deliveryAddress: string | null
+  deliveryDate: Date | null
+  deliveryCost: number
+  isFreeDelivery: boolean
   createdAt: Date
   updatedAt: Date
   user?: User
@@ -105,3 +111,46 @@ export interface Cart {
   tax: number
   total: number
 }
+
+// Delivery Management Types
+export interface DeliverySettings {
+  id: string
+  cityName: string
+  outOfCityMessage: string
+  contactEmail: string | null
+  contactPhone: string | null
+  whatsappLink: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface DeliveryDay {
+  id: string
+  dayOfWeek: number // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+  customName: string | null
+  deliveryCost: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CategoryDeliveryPolicy {
+  id: string
+  categoryId: string
+  minPurchaseForDelivery: number
+  minPurchaseForFreeDelivery: number
+  createdAt: Date
+  updatedAt: Date
+  category?: Category
+}
+
+export interface DeliveryDateException {
+  id: string
+  date: Date
+  isAvailable: boolean
+  customName: string | null
+  deliveryCost: number | null
+  createdAt: Date
+  updatedAt: Date
+}
+

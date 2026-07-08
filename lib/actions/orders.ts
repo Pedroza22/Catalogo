@@ -7,7 +7,10 @@ import type { Order, OrderStatus, PaymentMethod, CartItem } from '@/lib/types/da
 export async function createOrder(
   items: CartItem[],
   paymentMethod: PaymentMethod,
-  notes?: string
+  notes?: string,
+  deliveryDate?: Date | null,
+  deliveryCost?: number,
+  isFreeDelivery?: boolean
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -17,7 +20,7 @@ export async function createOrder(
   }
 
   const subtotal = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
-  const total = subtotal
+  const total = subtotal + (deliveryCost || 0)
 
   // Create order
   const { data: order, error: orderError } = await supabase
@@ -28,6 +31,9 @@ export async function createOrder(
       payment_method: paymentMethod,
       total,
       notes,
+      delivery_date: deliveryDate,
+      delivery_cost: deliveryCost || 0,
+      is_free_delivery: isFreeDelivery || false
     })
     .select()
     .single()
@@ -55,6 +61,24 @@ export async function createOrder(
     // Rollback order
     await supabase.from('orders').delete().eq('id', order.id)
     return { error: itemsError.message }
+  }
+
+  // Now update stock!
+  for (const item of items) {
+    // Update stock
+    await supabase.rpc('update_product_stock', {
+      p_product_id: item.product.id,
+      p_quantity: -item.quantity
+    })
+
+    // Record inventory movement
+    await supabase.from('inventory_movements').insert({
+      product_id: item.product.id,
+      user_id: user.id,
+      type: 'salida',
+      quantity: item.quantity,
+      reason: 'Venta',
+    })
   }
 
   // If credit payment, update client credit
@@ -133,36 +157,6 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 
   if (error) {
     return { error: error.message }
-  }
-
-  // If order is delivered, update inventory
-  if (status === 'entregado') {
-    const { data: order } = await supabase
-      .from('orders')
-      .select('*, items:order_items(*)')
-      .eq('id', orderId)
-      .single()
-
-    if (order?.items) {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      for (const item of order.items) {
-        // Update stock
-        await supabase.rpc('update_product_stock', {
-          p_product_id: item.product_id,
-          p_quantity: -item.quantity
-        })
-
-        // Record inventory movement
-        await supabase.from('inventory_movements').insert({
-          product_id: item.product_id,
-          user_id: user?.id,
-          type: 'salida',
-          quantity: item.quantity,
-          reason: 'Venta',
-        })
-      }
-    }
   }
 
   updateTag('orders')

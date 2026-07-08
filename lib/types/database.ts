@@ -138,3 +138,44 @@ export interface CartItem {
   selected_color?: string | null
   selected_size?: string | null
 }
+
+// Delivery Management Types
+export interface DeliverySettings {
+  id: string
+  city_name: string
+  out_of_city_message: string
+  contact_email: string | null
+  contact_phone: string | null
+  whatsapp_link: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface DeliveryDay {
+  id: string
+  day_of_week: number
+  custom_name: string | null
+  delivery_cost: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CategoryDeliveryPolicy {
+  id: string
+  category_id: string
+  min_purchase_for_delivery: number
+  min_purchase_for_free_delivery: number
+  created_at: string
+  updated_at: string
+}
+
+export interface DeliveryDateException {
+  id: string
+  date: string
+  is_available: boolean
+  custom_name: string | null
+  delivery_cost: number | null
+  created_at: string
+  updated_at: string
+}

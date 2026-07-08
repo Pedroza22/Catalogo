@@ -9,6 +9,7 @@ import type { OrderStatus } from '@/lib/types/database'
 interface OrderStatusSelectProps {
   orderId: string
   currentStatus: OrderStatus
+  onStatusUpdated?: () => void
 }
 
 const statuses: { value: OrderStatus; label: string }[] = [
@@ -19,7 +20,7 @@ const statuses: { value: OrderStatus; label: string }[] = [
   { value: 'cancelado', label: 'Cancelado' },
 ]
 
-export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectProps) {
+export function OrderStatusSelect({ orderId, currentStatus, onStatusUpdated }: OrderStatusSelectProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -27,6 +28,9 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
     setLoading(true)
     await updateOrderStatus(orderId, value)
     router.refresh()
+    if (onStatusUpdated) {
+      onStatusUpdated()
+    }
     setLoading(false)
   }
 

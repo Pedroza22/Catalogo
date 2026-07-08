@@ -240,3 +240,32 @@ export async function updateUserCredit(userId: string, limit: number): Promise<{
   }
 }
 
+// Delete user (admin only)
+export async function deleteUser(userId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await requireAdmin()
+    
+    const supabase = await createClient()
+    
+    // First, delete from profiles table
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', userId)
+
+    if (profileError) {
+      return { success: false, error: profileError.message }
+    }
+
+    // Note: To delete from auth.users you need admin API access
+    // The profile deletion will be the main action
+
+    return { success: true }
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    }
+    return { success: false, error: 'Error desconocido' }
+  }
+}
+

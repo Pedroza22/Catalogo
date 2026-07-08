@@ -1,19 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
+import { Calendar as CalendarComponent } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Badge } from '@/components/ui/badge'
 import { useCart } from '@/lib/hooks/use-cart'
 import { createOrder } from '@/lib/actions/orders'
-import { ShoppingCart, Trash2, Plus, Minus, Package, CreditCard, Banknote, Building2 } from 'lucide-react'
+import { getDeliveryDays, validateCartDelivery, getDeliveryDateExceptions } from '@/lib/actions/deliveries'
+import { ShoppingCart, Trash2, Plus, Minus, Package, CreditCard, Banknote, Calendar as CalendarIcon, Check } from 'lucide-react'
 import type { PaymentMethod } from '@/lib/types/database'
+import type { DeliveryDay, DeliveryDateException } from '@/lib/domain/entities'
+
+const dayNames = [
+  'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+]
 
 interface CartContentProps {
   user: { email: string; role?: string } | null
@@ -28,6 +36,13 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [deliveryDays, setDeliveryDays] = useState<DeliveryDay[]>([])
+  const [deliveryExceptions, setDeliveryExceptions] = useState<DeliveryDateException[]>([])
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | undefined>(undefined)
+  const [deliveryCost, setDeliveryCost] = useState(0)
+  const [isFreeDelivery, setIsFreeDelivery] = useState(false)
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [calendarOpen, setCalendarOpen] = useState(false)
 
   const availableCredit = creditLimit - currentCredit
 
@@ -39,9 +54,114 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
     }).format(price)
   }
 
+  // Function to check if a date is available and get its cost
+  const getDateInfo = (date: Date): { isAvailable: boolean; cost: number; label: string } => {
+    const dayOfWeek = date.getDay()
+    const dayData = deliveryDays.find(d => d.dayOfWeek === dayOfWeek)
+    const dateStr = date.toISOString().split('T')[0]
+    
+    // Check if there's an exception for this date (normalize both dates to YYYY-MM-DD string)
+    const exception = deliveryExceptions.find(
+      (e) => e.date.toISOString().split('T')[0] === dateStr
+    )
+    
+    let isAvailable = dayData?.isActive ?? false
+    let cost = dayData ? Number(dayData.deliveryCost) : 0
+    let label = dayData 
+      ? `${dayData.customName || dayNames[dayOfWeek]}, ${date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}` 
+      : ''
+
+    if (exception) {
+      isAvailable = exception.isAvailable
+      if (exception.deliveryCost !== null) {
+        cost = Number(exception.deliveryCost)
+      }
+      if (exception.customName) {
+        label = `${exception.customName}, ${date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}`
+      }
+    }
+
+    return { isAvailable, cost, label }
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [days, exceptions] = await Promise.all([
+        getDeliveryDays(),
+        getDeliveryDateExceptions()
+      ])
+      setDeliveryDays(days)
+      setDeliveryExceptions(exceptions)
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const validate = async () => {
+      if (!items.length) return
+
+      const categoryIds = items
+        .map(item => item.product.category_id)
+        .filter((id): id is string => id !== null && id !== undefined)
+
+      const result = await validateCartDelivery(total, categoryIds)
+
+      if (!result.isValid) {
+        setValidationMessage(result.message || null)
+        setIsFreeDelivery(false)
+        setDeliveryCost(0)
+      } else if (result.canBeFree) {
+        setValidationMessage(null)
+        setIsFreeDelivery(true)
+        setDeliveryCost(0)
+      } else {
+        setValidationMessage(null)
+        setIsFreeDelivery(false)
+        // If a date is selected, update cost
+        if (selectedDeliveryDate) {
+          const dateInfo = getDateInfo(selectedDeliveryDate)
+          setDeliveryCost(dateInfo.cost)
+        }
+      }
+    }
+    validate()
+  }, [total, items, selectedDeliveryDate, deliveryDays, deliveryExceptions, isFreeDelivery])
+
+  const handleDeliveryDateSelect = (date: Date | undefined) => {
+    if (!date) {
+      setSelectedDeliveryDate(undefined)
+      setDeliveryCost(0)
+      setCalendarOpen(false)
+      return
+    }
+    
+    // Check if the date is available
+    const dateInfo = getDateInfo(date)
+    if (!dateInfo.isAvailable) {
+      return
+    }
+    
+    setSelectedDeliveryDate(date)
+    setCalendarOpen(false)
+    
+    if (!isFreeDelivery) {
+      setDeliveryCost(dateInfo.cost)
+    }
+  }
+
   const handleCheckout = async () => {
     if (!user) {
       router.push('/auth/login?redirect=/carrito')
+      return
+    }
+
+    if (!selectedDeliveryDate && deliveryDays.length > 0) {
+      setError('Por favor selecciona una fecha de entrega')
+      return
+    }
+
+    if (validationMessage) {
+      setError(validationMessage)
       return
     }
 
@@ -53,7 +173,14 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
     setLoading(true)
     setError(null)
 
-    const result = await createOrder(items, paymentMethod, notes || undefined)
+    const result = await createOrder(
+      items, 
+      paymentMethod, 
+      notes || undefined,
+      selectedDeliveryDate,
+      deliveryCost,
+      isFreeDelivery
+    )
 
     if (result.error) {
       setError(result.error)
@@ -199,20 +326,93 @@ export function CartContent({ user, creditLimit, currentCredit }: CartContentPro
                     <span className="font-bold text-foreground">{formatPrice(total)}</span>
                   </div>
                   <div className="flex justify-between text-base">
-                    <span className="text-muted-foreground font-medium">Envío Estimado</span>
-                    <span className="font-bold text-green-600">Gratis</span>
+                    <span className="text-muted-foreground font-medium">Envío</span>
+                    {isFreeDelivery ? (
+                      <span className="font-bold text-green-600">Gratis</span>
+                    ) : (
+                      <span className="font-bold text-foreground">
+                        {selectedDeliveryDate ? formatPrice(deliveryCost) : 'Selecciona fecha'}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 <div className="pt-4 border-t-2 border-dashed">
                   <div className="flex justify-between items-end">
                     <span className="font-bold text-lg">Total a Pagar</span>
-                    <span className="font-black text-2xl text-primary">{formatPrice(total)}</span>
+                    <span className="font-black text-2xl text-primary">
+                      {formatPrice(total + (isFreeDelivery ? 0 : deliveryCost))}
+                    </span>
                   </div>
                 </div>
 
                 {user && (
                   <div className="space-y-6 pt-2">
+                    {/* Delivery Date Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                        <CalendarIcon className="w-4 h-4" />
+                        Fecha de Entrega
+                      </Label>
+                      <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDeliveryDate ? (
+                              getDateInfo(selectedDeliveryDate).label
+                            ) : (
+                              <span className="text-muted-foreground">Selecciona una fecha de entrega</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={selectedDeliveryDate}
+                            onSelect={handleDeliveryDateSelect}
+                            disabled={(date) => {
+                              const today = new Date()
+                              today.setHours(0, 0, 0, 0)
+                              const minDate = new Date(today)
+                              minDate.setDate(today.getDate() + 1)
+                              const maxDate = new Date(today)
+                              maxDate.setDate(today.getDate() + 14)
+                              if (date < minDate || date > maxDate) return true
+                              const dateInfo = getDateInfo(date)
+                              return !dateInfo.isAvailable
+                            }}
+                            className="rounded-md border"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {selectedDeliveryDate && !isFreeDelivery && (
+                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                          <p className="text-sm text-blue-800 font-medium">
+                            Costo de envío:
+                          </p>
+                          <Badge variant="default">
+                            {formatPrice(getDateInfo(selectedDeliveryDate).cost)}
+                          </Badge>
+                        </div>
+                      )}
+                      {isFreeDelivery && selectedDeliveryDate && (
+                        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <p className="text-sm text-green-800 font-medium flex items-center gap-2">
+                            <Check className="w-4 h-4" />
+                            🎉 Envío GRATIS por tu compra!
+                          </p>
+                        </div>
+                      )}
+                      {validationMessage && (
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <p className="text-sm text-yellow-800">{validationMessage}</p>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="space-y-3">
                       <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
                         Método de pago

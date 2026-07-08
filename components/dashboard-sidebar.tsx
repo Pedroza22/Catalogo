@@ -22,6 +22,7 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  Truck,
 } from 'lucide-react'
 import type { Profile } from '@/lib/types/database'
 
@@ -35,6 +36,7 @@ const adminLinks = [
   { href: '/dashboard/categorias', label: 'Categorías', icon: Tags },
   { href: '/dashboard/banners', label: 'Banners', icon: ImageIcon },
   { href: '/dashboard/pedidos', label: 'Pedidos', icon: ShoppingCart },
+  { href: '/dashboard/entregas', label: 'Gestión de Entregas', icon: Truck },
   { href: '/dashboard/clientes', label: 'Usuarios y Roles', icon: Users },
   { href: '/dashboard/inventario', label: 'Movimientos Inventario', icon: Warehouse },
   { href: '/dashboard/creditos', label: 'Créditos y Cartera', icon: CreditCard },
