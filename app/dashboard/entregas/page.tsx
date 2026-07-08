@@ -263,7 +263,7 @@ export default function DeliveryManagementPage() {
 
   if (loading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-[400px]">
+      <div className="p-4 sm:p-6 flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <div className="text-lg font-semibold">Cargando...</div>
           <div className="animate-pulse text-sm text-muted-foreground">Obteniendo datos de entregas...</div>
@@ -274,7 +274,7 @@ export default function DeliveryManagementPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="p-6 border border-red-200 bg-red-50 rounded-lg max-w-2xl mx-auto">
           <h2 className="text-xl font-bold text-red-800 mb-4">Error al cargar</h2>
           <p className="text-red-700 mb-4">{error}</p>
@@ -285,40 +285,48 @@ export default function DeliveryManagementPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Gestión de Entregas y Domicilios</h1>
-        <p className="text-muted-foreground">Configura los días, precios y políticas de entrega</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Gestión de Entregas y Domicilios</h1>
+        <p className="text-muted-foreground text-sm sm:text-base mt-2">Configura los días, precios y políticas de entrega</p>
       </div>
 
+      <div className="h-4"></div>
+      
       <Tabs defaultValue="settings" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="settings">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Configuración General
-          </TabsTrigger>
-          <TabsTrigger value="days">
-            <CalendarIcon className="w-4 h-4 mr-2" />
-            Días de Entrega
-          </TabsTrigger>
-          <TabsTrigger value="exceptions">
-            <CalendarIcon className="w-4 h-4 mr-2" />
-            Fechas Especiales
-          </TabsTrigger>
-          <TabsTrigger value="policies">
-            <DollarSign className="w-4 h-4 mr-2" />
-            Políticas por Categoría
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="inline-flex w-max grid-cols-1 lg:grid-cols-4 gap-2 p-1">
+            <TabsTrigger value="settings" className="text-xs sm:text-sm py-3 px-3 whitespace-nowrap">
+              <MessageSquare className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Configuración General</span>
+              <span className="sm:hidden">General</span>
+            </TabsTrigger>
+            <TabsTrigger value="days" className="text-xs sm:text-sm py-3 px-3 whitespace-nowrap">
+              <CalendarIcon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Días de Entrega</span>
+              <span className="sm:hidden">Días</span>
+            </TabsTrigger>
+            <TabsTrigger value="exceptions" className="text-xs sm:text-sm py-3 px-3 whitespace-nowrap">
+              <CalendarIcon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Fechas Especiales</span>
+              <span className="sm:hidden">Especiales</span>
+            </TabsTrigger>
+            <TabsTrigger value="policies" className="text-xs sm:text-sm py-3 px-3 whitespace-nowrap">
+              <DollarSign className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Políticas por Categoría</span>
+              <span className="sm:hidden">Políticas</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Settings Tab */}
-        <TabsContent value="settings" className="space-y-4">
+        <TabsContent value="settings" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Configuración de Entregas</CardTitle>
               <CardDescription>Configura los mensajes y datos de contacto</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="cityName">Nombre de la Ciudad</Label>
@@ -391,7 +399,7 @@ export default function DeliveryManagementPage() {
         </TabsContent>
 
         {/* Delivery Days Tab */}
-        <TabsContent value="days" className="space-y-4">
+        <TabsContent value="days" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Días de Entrega</CardTitle>
@@ -403,50 +411,126 @@ export default function DeliveryManagementPage() {
                   No hay días de entrega configurados.
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Día</TableHead>
-                      <TableHead>Precio de Domicilio</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead className="text-right">Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Día</TableHead>
+                          <TableHead>Precio de Domicilio</TableHead>
+                          <TableHead>Estado</TableHead>
+                          <TableHead className="text-right">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {deliveryDays.map((day) => (
+                          <TableRow key={day.id}>
+                            <TableCell>
+                              {editingDay?.dayOfWeek === day.dayOfWeek ? (
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    value={editingDay.customName || ''}
+                                    onChange={(e) => setEditingDay({ ...editingDay, customName: e.target.value })}
+                                    placeholder={dayNames[day.dayOfWeek]}
+                                    className="w-40"
+                                  />
+                                </div>
+                              ) : (
+                                <span className="font-medium">
+                                  {day.customName || dayNames[day.dayOfWeek]}
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {editingDay?.dayOfWeek === day.dayOfWeek ? (
+                                <Input
+                                  type="number"
+                                  value={editingDay.deliveryCost}
+                                  onChange={(e) => {
+                                    const num = Number(e.target.value)
+                                    setEditingDay({ ...editingDay, deliveryCost: isNaN(num) ? 0 : num })
+                                  }}
+                                  className="w-32"
+                                />
+                              ) : (
+                                <span>{formatPrice(day.deliveryCost)}</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {editingDay?.dayOfWeek === day.dayOfWeek ? (
+                                <Switch
+                                  checked={editingDay.isActive}
+                                  onCheckedChange={(checked) => setEditingDay({ ...editingDay, isActive: checked })}
+                                />
+                              ) : (
+                                <Badge variant={day.isActive ? 'default' : 'secondary'}>
+                                  {day.isActive ? 'Activo' : 'Inactivo'}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {editingDay?.dayOfWeek === day.dayOfWeek ? (
+                                <div className="flex justify-end gap-2">
+                                  <Button size="sm" onClick={handleSaveDay} disabled={saving}>
+                                    <Save className="w-4 h-4 mr-1" />
+                                    Guardar
+                                  </Button>
+                                  <Button size="sm" variant="ghost" onClick={() => setEditingDay(null)}>
+                                    Cancelar
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex justify-end gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => {
+                                      console.log('✏️ Starting edit for day:', day)
+                                      setEditingDay({
+                                        dayOfWeek: day.dayOfWeek,
+                                        isActive: day.isActive,
+                                        customName: day.customName || '',
+                                        deliveryCost: Number(day.deliveryCost),
+                                      })
+                                    }}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleToggleDayStatus(day.id, day.isActive)}
+                                  >
+                                    {day.isActive ? 'Desactivar' : 'Activar'}
+                                  </Button>
+                                </div>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  {/* Mobile Cards */}
+                  <div className="lg:hidden space-y-4">
                     {deliveryDays.map((day) => (
-                      <TableRow key={day.id}>
-                        <TableCell>
-                          {editingDay?.dayOfWeek === day.dayOfWeek ? (
-                            <div className="flex items-center gap-2">
+                      <div key={day.id} className="border rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            {editingDay?.dayOfWeek === day.dayOfWeek ? (
                               <Input
                                 value={editingDay.customName || ''}
                                 onChange={(e) => setEditingDay({ ...editingDay, customName: e.target.value })}
                                 placeholder={dayNames[day.dayOfWeek]}
-                                className="w-40"
                               />
-                            </div>
-                          ) : (
-                            <span className="font-medium">
-                              {day.customName || dayNames[day.dayOfWeek]}
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {editingDay?.dayOfWeek === day.dayOfWeek ? (
-                            <Input
-                              type="number"
-                              value={editingDay.deliveryCost}
-                              onChange={(e) => {
-                                const num = Number(e.target.value)
-                                setEditingDay({ ...editingDay, deliveryCost: isNaN(num) ? 0 : num })
-                              }}
-                              className="w-32"
-                            />
-                          ) : (
-                            <span>{formatPrice(day.deliveryCost)}</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
+                            ) : (
+                              <span className="font-medium text-lg">
+                                {day.customName || dayNames[day.dayOfWeek]}
+                              </span>
+                            )}
+                          </div>
                           {editingDay?.dayOfWeek === day.dayOfWeek ? (
                             <Switch
                               checked={editingDay.isActive}
@@ -457,10 +541,27 @@ export default function DeliveryManagementPage() {
                               {day.isActive ? 'Activo' : 'Inactivo'}
                             </Badge>
                           )}
-                        </TableCell>
-                        <TableCell className="text-right">
+                        </div>
+                        
+                        <div>
+                          <div className="text-sm text-muted-foreground mb-1">Precio de Domicilio</div>
                           {editingDay?.dayOfWeek === day.dayOfWeek ? (
-                            <div className="flex justify-end gap-2">
+                            <Input
+                              type="number"
+                              value={editingDay.deliveryCost}
+                              onChange={(e) => {
+                                const num = Number(e.target.value)
+                                setEditingDay({ ...editingDay, deliveryCost: isNaN(num) ? 0 : num })
+                              }}
+                            />
+                          ) : (
+                            <span className="font-medium">{formatPrice(day.deliveryCost)}</span>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-2 justify-end pt-2 border-t">
+                          {editingDay?.dayOfWeek === day.dayOfWeek ? (
+                            <>
                               <Button size="sm" onClick={handleSaveDay} disabled={saving}>
                                 <Save className="w-4 h-4 mr-1" />
                                 Guardar
@@ -468,9 +569,9 @@ export default function DeliveryManagementPage() {
                               <Button size="sm" variant="ghost" onClick={() => setEditingDay(null)}>
                                 Cancelar
                               </Button>
-                            </div>
+                            </>
                           ) : (
-                            <div className="flex justify-end gap-2">
+                            <>
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -485,6 +586,7 @@ export default function DeliveryManagementPage() {
                                 }}
                               >
                                 <Edit className="w-4 h-4" />
+                                Editar
                               </Button>
                               <Button
                                 size="sm"
@@ -493,59 +595,61 @@ export default function DeliveryManagementPage() {
                               >
                                 {day.isActive ? 'Desactivar' : 'Activar'}
                               </Button>
-                            </div>
+                            </>
                           )}
-                        </TableCell>
-                      </TableRow>
+                        </div>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Delivery Date Exceptions Tab */}
-        <TabsContent value="exceptions" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TabsContent value="exceptions" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle>Calendario</CardTitle>
                 <CardDescription>Selecciona una fecha para configurarla</CardDescription>
               </CardHeader>
-              <CardContent>
-                <CalendarComponent
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={handleDateSelect}
-                        month={calendarMonth}
-                        onMonthChange={setCalendarMonth}
-                        modifiers={{
-                          available: (date: Date) => {
-                            const exception = exceptions.find(
-                              (e) => e.date.toDateString() === date.toDateString()
-                            )
-                            return exception ? exception.isAvailable : false
-                          },
-                          unavailable: (date: Date) => {
-                            const exception = exceptions.find(
-                              (e) => e.date.toDateString() === date.toDateString()
-                            )
-                            return exception ? !exception.isAvailable : false
-                          },
-                        }}
-                        modifiersClassNames={{
-                          available: "bg-green-100 text-green-900",
-                          unavailable: "bg-red-100 text-red-900",
-                        }}
-                        className="rounded-md border"
-                      />
+              <CardContent className="p-2 sm:p-6">
+                <div className="overflow-x-auto">
+                  <CalendarComponent
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={handleDateSelect}
+                          month={calendarMonth}
+                          onMonthChange={setCalendarMonth}
+                          modifiers={{
+                            available: (date: Date) => {
+                              const exception = exceptions.find(
+                                (e) => e.date.toDateString() === date.toDateString()
+                              )
+                              return exception ? exception.isAvailable : false
+                            },
+                            unavailable: (date: Date) => {
+                              const exception = exceptions.find(
+                                (e) => e.date.toDateString() === date.toDateString()
+                              )
+                              return exception ? !exception.isAvailable : false
+                            },
+                          }}
+                          modifiersClassNames={{
+                            available: "bg-green-100 text-green-900",
+                            unavailable: "bg-red-100 text-red-900",
+                          }}
+                          className="rounded-md border w-full"
+                        />
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>
+                <CardTitle className="text-lg">
                   {selectedDate 
                     ? selectedDate.toLocaleDateString('es-CO', { 
                         weekday: 'long', 
@@ -570,13 +674,13 @@ export default function DeliveryManagementPage() {
                           setEditingException({ ...editingException, isAvailable: checked })
                         }
                       />
-                      <Label htmlFor="isAvailable">
+                      <Label htmlFor="isAvailable" className="text-sm">
                         {editingException.isAvailable ? 'Disponible para entrega' : 'No disponible para entrega'}
                       </Label>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="customName">Nombre Personalizado (opcional)</Label>
+                      <Label htmlFor="customName" className="text-sm">Nombre Personalizado (opcional)</Label>
                       <Input
                         id="customName"
                         value={editingException.customName || ''}
@@ -591,7 +695,7 @@ export default function DeliveryManagementPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="deliveryCost">
+                      <Label htmlFor="deliveryCost" className="text-sm">
                         Precio de Domicilio (opcional, deja vacío para usar el precio del día)
                       </Label>
                       <Input
@@ -609,7 +713,7 @@ export default function DeliveryManagementPage() {
                       />
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button onClick={handleSaveException} disabled={saving} className="flex-1">
                         {saving ? (
                           <>
@@ -643,7 +747,7 @@ export default function DeliveryManagementPage() {
         </TabsContent>
 
         {/* Policies Tab */}
-        <TabsContent value="policies" className="space-y-4">
+        <TabsContent value="policies" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Políticas de Entrega por Categoría</CardTitle>
@@ -652,7 +756,7 @@ export default function DeliveryManagementPage() {
             <CardContent>
               <div className="mb-4">
                 {categories.length > 0 && (
-                  <div className="grid gap-4 md:grid-cols-3 mb-6">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
                     <div className="space-y-2">
                       <Label>Categoría</Label>
                       <Select
@@ -710,8 +814,8 @@ export default function DeliveryManagementPage() {
                             }}
                           />
                         </div>
-                        <div className="flex items-end">
-                          <Button onClick={handleSavePolicy} disabled={saving}>
+                        <div className="flex items-end md:col-span-3 lg:col-span-1">
+                          <Button onClick={handleSavePolicy} disabled={saving} className="w-full md:w-auto">
                             {saving ? 'Guardando...' : 'Guardar'}
                           </Button>
                         </div>
@@ -730,54 +834,109 @@ export default function DeliveryManagementPage() {
                     No hay políticas configuradas
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Categoría</TableHead>
-                        <TableHead>Mínimo para Domicilio</TableHead>
-                        <TableHead>Mínimo para Envío Gratis</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <>
+                    {/* Desktop Table */}
+                    <div className="hidden lg:block overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Categoría</TableHead>
+                            <TableHead>Mínimo para Domicilio</TableHead>
+                            <TableHead>Mínimo para Envío Gratis</TableHead>
+                            <TableHead className="text-right">Acciones</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {policies.map((policy) => {
+                            const category = categories.find((c: any) => c.id === policy.categoryId)
+                            return (
+                              <TableRow key={policy.id}>
+                                <TableCell className="font-medium">{category?.name || 'Categoría Eliminada'}</TableCell>
+                                <TableCell>{formatPrice(Number(policy.minPurchaseForDelivery))}</TableCell>
+                                <TableCell>{formatPrice(Number(policy.minPurchaseForFreeDelivery))}</TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        console.log('✏️ Starting edit for policy:', policy)
+                                        setEditingPolicy({
+                                          categoryId: policy.categoryId,
+                                          minPurchaseForDelivery: Number(policy.minPurchaseForDelivery),
+                                          minPurchaseForFreeDelivery: Number(policy.minPurchaseForFreeDelivery),
+                                        })
+                                      }}
+                                    >
+                                      <Edit className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="text-destructive"
+                                      onClick={() => handleDeletePolicy(policy.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    
+                    {/* Mobile Cards */}
+                    <div className="lg:hidden space-y-4">
                       {policies.map((policy) => {
                         const category = categories.find((c: any) => c.id === policy.categoryId)
                         return (
-                          <TableRow key={policy.id}>
-                            <TableCell className="font-medium">{category?.name || 'Categoría Eliminada'}</TableCell>
-                            <TableCell>{formatPrice(Number(policy.minPurchaseForDelivery))}</TableCell>
-                            <TableCell>{formatPrice(Number(policy.minPurchaseForFreeDelivery))}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => {
-                                    console.log('✏️ Starting edit for policy:', policy)
-                                    setEditingPolicy({
-                                      categoryId: policy.categoryId,
-                                      minPurchaseForDelivery: Number(policy.minPurchaseForDelivery),
-                                      minPurchaseForFreeDelivery: Number(policy.minPurchaseForFreeDelivery),
-                                    })
-                                  }}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-destructive"
-                                  onClick={() => handleDeletePolicy(policy.id)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+                          <div key={policy.id} className="border rounded-lg p-4 space-y-3">
+                            <div className="font-medium text-lg">
+                              {category?.name || 'Categoría Eliminada'}
+                            </div>
+                            <div className="space-y-2">
+                              <div>
+                                <span className="text-sm text-muted-foreground">Mínimo para Domicilio: </span>
+                                <span className="font-medium">{formatPrice(Number(policy.minPurchaseForDelivery))}</span>
                               </div>
-                            </TableCell>
-                          </TableRow>
+                              <div>
+                                <span className="text-sm text-muted-foreground">Mínimo para Envío Gratis: </span>
+                                <span className="font-medium">{formatPrice(Number(policy.minPurchaseForFreeDelivery))}</span>
+                              </div>
+                            </div>
+                            <div className="flex gap-2 justify-end pt-2 border-t">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  console.log('✏️ Starting edit for policy:', policy)
+                                  setEditingPolicy({
+                                    categoryId: policy.categoryId,
+                                    minPurchaseForDelivery: Number(policy.minPurchaseForDelivery),
+                                    minPurchaseForFreeDelivery: Number(policy.minPurchaseForFreeDelivery),
+                                  })
+                                }}
+                              >
+                                <Edit className="w-4 h-4 mr-1" />
+                                Editar
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive"
+                                onClick={() => handleDeletePolicy(policy.id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Eliminar
+                              </Button>
+                            </div>
+                          </div>
                         )
                       })}
-                    </TableBody>
-                  </Table>
+                    </div>
+                  </>
                 )}
               </div>
             </CardContent>

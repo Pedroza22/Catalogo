@@ -134,11 +134,13 @@ export default function PedidosPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Pedidos</h1>
-        <p className="text-muted-foreground">Gestiona los pedidos de tus clientes</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Pedidos</h1>
+        <p className="text-muted-foreground text-sm sm:text-base mt-2">Gestiona los pedidos de tus clientes</p>
       </div>
+
+      <div className="h-4"></div>
 
       <Card>
         <CardHeader>
@@ -150,19 +152,19 @@ export default function PedidosPage() {
           </div>
           
           {/* Search and Filter Controls */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <div className="relative flex-1">
+          <div className="flex flex-col gap-4 mt-4">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por ID, cliente o dirección..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-full"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4" />
                     <SelectValue placeholder="Estado" />
@@ -179,7 +181,7 @@ export default function PedidosPage() {
               </Select>
 
               <Select value={paymentFilter} onValueChange={setPaymentFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="Pago" />
                 </SelectTrigger>
                 <SelectContent>
@@ -191,7 +193,7 @@ export default function PedidosPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           {filteredOrders.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
@@ -203,93 +205,194 @@ export default function PedidosPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="bg-muted/50">ID Pedido</TableHead>
-                    <TableHead className="bg-muted/50">Cliente</TableHead>
-                    <TableHead className="bg-muted/50">Dirección</TableHead>
-                    <TableHead className="bg-muted/50">Fecha Pedido</TableHead>
-                    <TableHead className="bg-muted/50">Fecha Entrega</TableHead>
-                    <TableHead className="bg-muted/50">Pago</TableHead>
-                    <TableHead className="bg-muted/50 text-right">Total</TableHead>
-                    <TableHead className="bg-muted/50">Estado</TableHead>
-                    <TableHead className="bg-muted/50 text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOrders.map((order) => {
-                    const outOfStockItems = getOutOfStockItems(order)
-                    const hasStockIssues = outOfStockItems.length > 0
-                    
-                    return (
-                        <TableRow 
-                          className={`hover:bg-muted/20 cursor-pointer ${hasStockIssues ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' : ''}`} 
-                          onClick={() => {
-                            setSelectedOrder({ ...order, outOfStockItems })
-                            setDialogOpen(true)
-                          }}
-                          key={order.id}
-                        >
-                          <TableCell className="font-mono text-sm flex items-center gap-2">
-                            {hasStockIssues && <AlertCircle className="h-4 w-4 text-red-500" />}
-                            #{order.id.slice(0, 8)}
-                          </TableCell>
-                          <TableCell>
+            <div className="space-y-4">
+              {/* Desktop Table */}
+              <div className="hidden lg:block overflow-x-auto rounded-lg border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="bg-muted/50">ID Pedido</TableHead>
+                      <TableHead className="bg-muted/50">Cliente</TableHead>
+                      <TableHead className="bg-muted/50">Dirección</TableHead>
+                      <TableHead className="bg-muted/50">Fecha Pedido</TableHead>
+                      <TableHead className="bg-muted/50">Fecha Entrega</TableHead>
+                      <TableHead className="bg-muted/50">Pago</TableHead>
+                      <TableHead className="bg-muted/50 text-right">Total</TableHead>
+                      <TableHead className="bg-muted/50">Estado</TableHead>
+                      <TableHead className="bg-muted/50 text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOrders.map((order) => {
+                      const outOfStockItems = getOutOfStockItems(order)
+                      const hasStockIssues = outOfStockItems.length > 0
+                      
+                      return (
+                          <TableRow 
+                            className={`hover:bg-muted/20 cursor-pointer ${hasStockIssues ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' : ''}`} 
+                            onClick={() => {
+                              setSelectedOrder({ ...order, outOfStockItems })
+                              setDialogOpen(true)
+                            }}
+                            key={order.id}
+                          >
+                            <TableCell className="font-mono text-sm flex items-center gap-2">
+                              {hasStockIssues && <AlertCircle className="h-4 w-4 text-red-500" />}
+                              #{order.id.slice(0, 8)}
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{order.client?.full_name || 'Cliente'}</p>
+                                <p className="text-xs text-muted-foreground">{order.client?.email}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-start gap-1 text-muted-foreground">
+                                <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                                <span className="line-clamp-2 max-w-[200px] text-sm">{order.delivery_address || 'No especificada'}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm">{formatDate(order.created_at)}</TableCell>
+                            <TableCell>
+                              <div className="text-sm">
+                                {order.delivery_date ? (
+                                  <div>
+                                    <p>{formatDate(order.delivery_date)}</p>
+                                    {order.is_free_delivery ? (
+                                      <Badge variant="secondary" className="text-xs mt-1">
+                                        Envío Gratis
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="text-xs mt-1">
+                                        {formatPrice(order.delivery_cost || 0)}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-muted-foreground">No especificada</span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{paymentLabels[order.payment_method]}</Badge>
+                            </TableCell>
+                            <TableCell className="text-right font-medium">{formatPrice(order.total)}</TableCell>
+                            <TableCell>
+                              <Badge variant={statusColors[order.status]}>
+                                {statusLabels[order.status]}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <OrderStatusSelect 
+                                orderId={order.id} 
+                                currentStatus={order.status} 
+                                onStatusUpdated={fetchOrders}
+                              />
+                            </TableCell>
+                          </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {/* Mobile Cards */}
+              <div className="lg:hidden space-y-4">
+                {filteredOrders.map((order) => {
+                  const outOfStockItems = getOutOfStockItems(order)
+                  const hasStockIssues = outOfStockItems.length > 0
+                  
+                  return (
+                    <div 
+                      key={order.id}
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        hasStockIssues 
+                          ? 'bg-red-50 border-red-200 hover:bg-red-100' 
+                          : 'bg-white hover:bg-muted/20'
+                      }`}
+                      onClick={() => {
+                        setSelectedOrder({ ...order, outOfStockItems })
+                        setDialogOpen(true)
+                      }}
+                    >
+                      {/* ID Pedido */}
+                      <div className="flex items-center gap-2 mb-3">
+                        {hasStockIssues && <AlertCircle className="h-4 w-4 text-red-500" />}
+                        <span className="font-mono text-sm font-medium">#{order.id.slice(0, 8)}</span>
+                        <Badge variant={statusColors[order.status]} className="ml-auto">
+                          {statusLabels[order.status]}
+                        </Badge>
+                      </div>
+                      
+                      {/* Cliente */}
+                      <div className="mb-3">
+                        <p className="text-xs text-muted-foreground mb-1">Cliente</p>
+                        <p className="font-medium">{order.client?.full_name || 'Cliente'}</p>
+                        <p className="text-xs text-muted-foreground">{order.client?.email}</p>
+                      </div>
+                      
+                      {/* Dirección */}
+                      <div className="mb-3">
+                        <p className="text-xs text-muted-foreground mb-1">Dirección</p>
+                        <div className="flex items-start gap-1">
+                          <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground line-clamp-2">
+                            {order.delivery_address || 'No especificada'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Fechas */}
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Pedido</p>
+                          <p className="text-sm">{formatDate(order.created_at)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Entrega</p>
+                          {order.delivery_date ? (
                             <div>
-                              <p className="font-medium">{order.client?.full_name || 'Cliente'}</p>
-                              <p className="text-xs text-muted-foreground">{order.client?.email}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-start gap-1 text-muted-foreground">
-                              <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                              <span className="line-clamp-2 max-w-[200px] text-sm">{order.delivery_address || 'No especificada'}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm">{formatDate(order.created_at)}</TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {order.delivery_date ? (
-                                <div>
-                                  <p>{formatDate(order.delivery_date)}</p>
-                                  {order.is_free_delivery ? (
-                                    <Badge variant="secondary" className="text-xs mt-1">
-                                      Envío Gratis
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="outline" className="text-xs mt-1">
-                                      {formatPrice(order.delivery_cost || 0)}
-                                    </Badge>
-                                  )}
-                                </div>
+                              <p className="text-sm">{formatDate(order.delivery_date)}</p>
+                              {order.is_free_delivery ? (
+                                <Badge variant="secondary" className="text-xs mt-1">
+                                  Envío Gratis
+                                </Badge>
                               ) : (
-                                <span className="text-muted-foreground">No especificada</span>
+                                <Badge variant="outline" className="text-xs mt-1">
+                                  {formatPrice(order.delivery_cost || 0)}
+                                </Badge>
                               )}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{paymentLabels[order.payment_method]}</Badge>
-                          </TableCell>
-                          <TableCell className="text-right font-medium">{formatPrice(order.total)}</TableCell>
-                          <TableCell>
-                            <Badge variant={statusColors[order.status]}>
-                              {statusLabels[order.status]}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <OrderStatusSelect 
-                              orderId={order.id} 
-                              currentStatus={order.status} 
-                              onStatusUpdated={fetchOrders}
-                            />
-                          </TableCell>
-                        </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">No especificada</span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Total y Pago */}
+                      <div className="flex items-center justify-between pt-3 border-t">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Pago</p>
+                          <Badge variant="outline">{paymentLabels[order.payment_method]}</Badge>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground mb-1">Total</p>
+                          <p className="font-bold text-lg">{formatPrice(order.total)}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Acciones */}
+                      <div className="mt-4">
+                        <OrderStatusSelect 
+                          orderId={order.id} 
+                          currentStatus={order.status} 
+                          onStatusUpdated={fetchOrders}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
         </CardContent>
